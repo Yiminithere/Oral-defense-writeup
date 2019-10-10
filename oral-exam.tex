@@ -1,0 +1,888 @@
+\documentclass[11pt]{article}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amscd}
+%\usepackage[latin2]{inputenc}
+\usepackage{t1enc}
+\usepackage[mathscr]{eucal}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{pict2e}
+\usepackage{epic}
+\numberwithin{equation}{section}
+\usepackage[margin=2.9cm]{geometry}
+\usepackage{epstopdf}
+\usepackage{amsmath,amsthm,verbatim,amssymb,amsfonts,amscd, graphicx}
+\usepackage{mathtools}
+\usepackage[dvipsnames]{xcolor}
+
+ 
+ \usepackage[backend=bibtex,firstinits=true,style=alphabetic,maxbibnames=9,natbib=true,url=false,sorting=nyt,doi=true,backref=false]{biblatex}
+%\usepackage[backend=bibtex,firstinits=true,style=alphabetic,natbib=true,maxcitenames=2,maxbibnames=10,url=false,doi=true,backref=false]{biblatex}
+\addbibresource{oral-exam.bib}
+\renewbibmacro{in:}{\ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
+\renewcommand*{\bibfont}{\small}
+ 
+\usepackage[colorlinks,linkcolor = red, citecolor=blue]{hyperref} 
+
+% 
+%\definecolor{mypink1}{rgb}{0.858, 0.188, 0.478}
+%\definecolor{mypink2}{RGB}{219, 48, 122}
+%\definecolor{mypink3}{cmyk}{0, 0.7808, 0.4429, 0.1412}
+%\definecolor{mygray}{gray}{0.6}
+%
+
+ 
+ 
+ \theoremstyle{plain}
+\newtheorem{Th}{Theorem}[section]
+\newtheorem{Lemma}[Th]{Lemma}
+\newtheorem{Cor}[Th]{Corollary}
+\newtheorem{Prop}[Th]{Proposition}
+
+ \theoremstyle{definition}
+\newtheorem{Def}[Th]{Definition}
+\newtheorem{Conj}[Th]{Conjecture}
+\newtheorem{Rem}[Th]{Remark}
+\newtheorem{?}[Th]{Problem}
+\newtheorem{Ex}[Th]{Example}
+
+\newcommand{\im}{\operatorname{im}}
+\newcommand{\Hom}{{\rm{Hom}}}
+\newcommand{\diam}{{\rm{diam}}}
+\newcommand{\ovl}{\overline}
+%\newcommand{\M}{\mathbb{M}}
+
+\def\R{{\mathbb R}}
+\def\Q{{\mathbb Q}}
+\def\Z{{\mathbb Z}}
+\def\N{{\mathbb N}}
+\def\C{{\mathbb C}}
+\def\E{{\mathbb E}}
+\def\R{{\mathbb R}}
+\def\Y{{\mathcal Y}}
+\def\L{{\mathcal L}}
+\def\H{{\mathcal H}}
+\def\D{{\mathcal D}}
+\def\P{{\mathbb P}}
+\def\M{{\mathbb M}}
+\def\S{{\mathbb S}}
+\def\A{{\mathbf A}}
+\def\x{{\mathbf x}}
+\def\b{{\mathbf b}}
+\def\a{{\mathbf a}}
+\def\Ph{{\mathbf {\Phi}}}
+
+\def\h{{\mathbf{h}}}
+\def\G{{\Gamma}}
+\def\s{{\sigma}}
+\def\e{{\varepsilon}}
+\def\l{{\lambda}}
+\def\p{{\phi}}
+\def\v{{\mathbf{v}}}
+\def\t{{\theta}}
+\def\z{{\zeta}}
+\def\o{{\omega}}
+\def\y{{\mathbf{y}}}
+\def\g{{\mathbf{g}}}
+\def\u{{\mathbf{u}}}
+\def\w{{\mathbf{w}}}
+
+
+
+\begin{document}
+
+\title{Analysis of The Ratio of $\ell_1$ and $\ell_2$ Norms in Compressed Sensing}
+
+\maketitle
+
+
+%\chapter{Introduction}
+
+\section{Background}
+
+Compressed Sensing (CS), which is also called compressive sensing or compressive sampling, is a modern framework in signal processing. It was first introduced by Donoho, Cand\`es and Tao in their seminal papers  \cite{donoho2006compressed}, \cite{emmanuel2004robust} and \cite{candes2004near}, and has been widely studied by many researchers thereafter. In the following of this chapter, we aim to give a brief introduction to the background of CS as well as some motivations behind it. 
+
+In mathematics, an $n$-dimensional signal corresponds to a vector $\x$ in $\R^n$. It can be viewed as the discrete approximation of a continuous function at $n$ points. An important task in signal processing is to aquire the signal and transmit it. The traditional way of doing this involves first sampling the signal at Nyquist-rate, then calculating the new representation of the signal under a new basis/frame and retaining only a few important ones for transmission. The first step is equivalent to multiplying $\x$ by an $n\times n$ identity matrix to get its representation under the canonical basis, and the second step suffices to find the coefficients of $\x$ under a different basis/frames allowing for a more convenient representation. The convenience here is meant by a fast-decaying or compressible structure. For simplicity, one can think of it as there are only a few non-zero components in the representation of $\x$. Indeed, the second step of the traditional method implies that the information of $\x$ is concentrated in a much lower dimensional subspace of $\R^n$, while the first step, inevitably, requires sampling $\x$ at least $n$ times. This leads to the very natural question asked in \cite{donoho2006compressed}: why go to so much effort to aquire all the data when most of what we get will be thrown away? Can't we just directly measure the part that will not end up being thrown away? This motivates a completely new different modality in signal processing called compressed sensing.
+
+As we have mentioned above, validity of the second step of the traditional method is based on the assumption that $\x$ allows for a sparse representation under some basis (frames). This is not unusual in many practical situations. For example, image data is often well-localized, thus can be sparsely represented after the wavelet transform. Speech signal is always between certain frequency range, therefore is sparsely representable once transformed into the frequency domain. To improve the economy of the sampling procedure, one may propose to take some linear measurement of $\x$ using the basis/frames under which $\x$ is prior known to have a sparse representation. Unfortunately, one normally does not have the information in advance which part of basis is used in representing $\x$. This again implies that at least $\mathcal{O}(n)$ number of measurements need to be taken. A different philosophy of designing the measurement matrix is off the beaten track. 
+
+To gain some in-depth insight into the problem we are facing, it is necessary to set up an appropriate mathematical framework. The first step is to define the problem. Let $\x_0\in\R^n$ be the true signal we are interested to sample and transmit in signal processing. Suppose that $\x_0$ can be sparsely represented under the basis/frame $\Ph\in\R^{n\times k}$, where $k\geq n$. In other words,
+\begin{align*}
+\x_0 = \Ph\tilde{\x_0}
+\end{align*} 
+for some $\tilde{\x}\in\R^k$ which is sparse. We may assume that 
+\begin{align*}
+||\tilde{\x_0}||_0:=\left|\{i:  (\tilde{\x_0})_i\neq 0\}\right|=s\ll n.
+\end{align*}
+The problem we are interested in understanding can be stated as divising a good measurement $\A\in\R^{m\times n}$ such that by solving 
+\begin{align}
+\A\Ph\x=\A\x = \A\x_0 = \A\Ph\tilde{\x_0},\label{origin}
+\end{align}    
+one is able to recover $\x_0$, where $\tilde{x}$ is the representation of $\x$ under $\Ph$. Since $\Ph$ is known, we can always incorporate $\Ph$ into $\A$ can define $\tilde{\A}=\A\Ph$. It is therefore enough to consider the case where $\Ph=\mathbf{I}_n$. Then (\ref{origin}) reduces to
+\begin{align}
+\A\x = \A\x_0,\label{origin'}
+\end{align} 
+with $||\x_0||_0=s$. 
+
+Our goal is to find an $\A$ such that $m$ has a stronger dependence on $s$ other than $n$. However, it is well known from classical linear algebra that if $\A$ has full row rank, (\ref{origin'}) allows for infinitely many solutions if and only if $m<n$. This means that working with (\ref{origin'}) directly seems impossible to find the right $m$, unless some additional constraint is added. The sparsity information, as expected, becomes extremely crucial in such situation. In fact, it is impossible to know exactly where the non-zero components are in $\x_0$; however, it is not hard to obtain an upper bound on how many non-zeros $\x_0$ has, which corresponds to the truncation level in the transmission step in the tradtional method. This gives rises to the reformulation of (\ref{origin'}) with a sparsity constraint:  
+\begin{align}
+\A\x = \A\x_0 \ \ \ \text{subject to}\ ||\x||_0\leq s.\label{cs-pre}
+\end{align} 
+It is easy to see that (\ref{cs-pre}) is equivalent to the following combinatorial optimization problem:
+\begin{align}
+\min ||\x||_0 \ \ \ \text{subject to}\ \A\x=\A\x_0.\label{cs}
+\end{align} 
+In most literature, (\ref{cs}) is referred to as the \emph{mathematical compressed sensing problem}. 
+
+The first question to be addressed is the well-definedness of (\ref{cs}). In other words, given $\x_0$, for what measurement matrices $\A$ does (\ref{cs}) admit a unique solution? Donoho and Elad gave an answer to this question in \cite{donoho2003optimally} using the spark of a matrix. 
+
+\begin{Def}
+The \emph{spark} of a matrix $\A$ is the smallest number of columns from $\A$ that are linearly-dependent. 
+\end{Def}
+
+\begin{Th}[Donoho, Elad]\label{spark}
+$\x_0$ is the unique solution to (\ref{cs}) if $spark(\A)>2s$. 
+\end{Th}
+\begin{proof}
+Suppose that $\x_0'\neq\x_0$ satisfies $\A\x'_0=\A\x_0$. Then $\A(\x_0'-\x_0)=\mathbf{0}$. Therefore, there exists a subset of column vectors of $\A$ that are linearly-dependent and of size $||\x_0'-\x_0||_0$. By the definition of spark, 
+\begin{align*}
+||\x'_0||_0+||\x_0||_0\geq ||\x'_0-\x_0||_0\geq spark(A)>2s, 
+\end{align*}
+which implies $||\x'_0||_0>s$. Hence, $\x_0$ is the unique solution to (\ref{cs}).   
+\end{proof}
+For most $m\times n$ ($m<n$) matrices $\A$ at a general position, $spark(A)=m+1$. This is the following Theorem. 
+\begin{Th}\label{random mesurement}
+Let $\A\in\R^{m\times n}$ be a random matrix. Suppose that the columns of $\A$ are independent and have pdfs. Then, 
+\begin{align*}
+\P\left(spark(\A)=m+1\right)=1. 
+\end{align*}
+\end{Th} 
+\begin{proof}
+For any $m\times m$ square submatrix $\tilde{\A}$ of $\A$, $\det(\tilde{\A})$ is a continuous random variable having a pdf. Therefore, $\P(\tilde{\A}\ \text{is\ invertible})=\P(\det(\tilde{\A})=0)=0$. The proof is completed by noting that there are only finite choices for $\tilde{\A}$. 
+\end{proof}
+
+Theorem \ref{spark} and \ref{random mesurement} together teach us a possible way to construct compressed sensing matrices and how small we should expect $m$ to be in theory. They are the mathematical foundation for comporessed sensing. As we will see later, the random nature of $\A$ will give it some distinct advantages that are not available for many determinstic choices. We shall mention that in a recent review paper \cite{rani2018systematic}, it has been pointed out that random measurement $\A$ is not appropriate to be transmitted  along with the signal in some situations. A quest for the construction of $\A$ with less randomness (or deterministic) is desired, see \cite{kasiviswanathan2019restricted}. But this is beyond our discussion of the mathematical aspect of (\ref{cs}) and therefore will not be pursued further. In the sequel we shall assume that $\text{spark}(\A)=m+1>2s$. 
+ 
+ 
+\section{Two Classical Approaches}
+
+Having settled the well-definedness of CS, it is natural to ask how to recover $\x_0$ on the receiver's side. Note that the economical sampling in CS could result in more workload in the process of transmission and decoding. Suppose that one can send both the measurement matrix $\A$ and the measured signal $\b=\A\x_0$ to the receiver's side. The remaining question comes down reconstructing $\x_0$ from $\A$ and $\b$. This is equivalent to seeking an effective algorithm to solve (\ref{cs}). The naive choice, which is to exhaustively search for all possible column subsets of size $s$ of $\A$, is impossible when $n$ is large. A better decoding strategy for the reconstruction of $\x_0$ within reasonable time is much desired. 
+
+Many people have made substantial  contributions to solve (\ref{cs}) since $2005$, and the main ideas behind them can either be summarized as greedy algorithms or relaxation methods. These two approaches have completely different philosophies, as will be seen in the rest of this section.
+
+\subsection{Greedy Algorithms}
+
+One of the most important greedy algorithms in CS is called the Orthogonal Matching Pursuit (OMP). It was first introduced and popularized by Gilbert and Tropp, see \cite{tropp2004greed} and \cite{tropp2007signal}. The idea is pretty simple. Note that $\b$ is a sparse linear combination of the column vectors of $\A$. If the columns of $\A$ are mutually orthogonal, then $\b$ can be simply written as 
+\begin{align*}
+\b=\sum_{i=1}^n\frac{\langle\a_i, \b\rangle}{||\a_i||_2^2}\a_i=\sum_{i\in\text{supp}(\x_0)}\frac{\langle\a_i, \b\rangle}{||\a_i||_2^2}\a_i, 
+\end{align*} 
+where $\a_i$ is the $i$-th column of $\A$. In this case, it is enough to calculate the inner product of $\b$ with $\a_i$ and pick out those nonzeros. Unfortunately, the columns of $\A$ cannot be orthogonal due to the economical sampling assumption $m<n$. However, it is known that in high-dimensional space that there exists exponentially many vectors that are almost orthogonal. Suppose that the columns of $\A$ satisfy the almost orthogonality assumption. It is still hopeful to do what we intended but pick out the ones that are far away from $0$. A concept called \emph{coherence} that quantifies the property of almost orthogonality is given below.
+
+\begin{Def}
+The \emph{coherence} of a matrix $\A$ is defined by
+\begin{align*}
+\mu(\A)=\max_{1\leq i\neq j\leq n}\frac{|\langle\a_i, \a_i\rangle|}{||\a_i||_2||\a_j||_2}. 
+\end{align*} 
+\end{Def}
+
+It is easy to see from definition that $\mu(\A)\in [0, 1]$. Small $\mu(\A)$ correspond to incoherent measurements. $\mu(\A)=0$ if and only if the columns of $\A$ are mutually orthogonal.
+
+The steps of OMP can be briefly described as follows. Let $\mathbf{r}$ denote the residual and $I$ denote the detected support. For initialization, set $\mathbf{r}=\b$ and $I=\emptyset$. $\e>0$ is a parameter marking the stop of the algorithm. We start by calculating $\A^T\mathbf{r}$ and selecting one of its entries with the largest magnitude. We record this index by $i$, then update $I$ by $I\cup\{i\}$ and $\mathbf{r}=\b-\A_I(\A_I^T \A_I)^{-1}\A_I^T \b$, where $\A_I$ is the restriction of $\A$ to the columns with index in $I$. The update on $\mathbf{r}$ can be seen as removing the effect of components in the detected support $I$ on $\b$ through orthogonal projection. If $||\mathbf{r}||_2<\e$ or $|I|=s$, then the algorithm terminates and $\x$ is computed by the least-squares projection $\x=(\A_I^T \A_I)^{-1}\A_I^T \b$. Otherwise go back to the first step. 
+
+Tropp gives the following exact recovery condition that guarantees the success of OMP. 
+
+\begin{Th}[Exact Recovery Condition, or ERC]
+Let $S$ be the support of the sparse vector $\x_0$ and $\A_S$ be the restriction of $\A$ to the columns in $S$. Then, $\x_0$ can be exactly recovered by OMP within $s$ steps if $\A$ satisfies the following exact recovery condition
+\begin{align}
+\max_{i\in S^c}||(\A^T_S\A_S)^{-1}\A^T_S\a_i||_1<1.\label{exact-tropp}
+\end{align} 
+\end{Th}
+
+Tropp also gives a sufficient condition for (\ref{exact-tropp}) to hold uniformly for all $S$ using the mutual coherence of $\A$:
+
+\begin{Th}\label{unif-OMP}
+(\ref{exact-tropp}) holds for all $S$ with $|S|\leq s$ if 
+\begin{align*}
+s<\frac{1}{2}\left(1+\frac{1}{\mu(\A)}\right).
+\end{align*} 
+\end{Th}
+Note that Theorem \ref{unif-OMP} provides a sufficient condition for the uniform recovery of $\x_0$ using OMP. And for a wide class of random matrices, it was shown in \cite{cai2011limiting} that $\mu(\A)\sim\mathcal{O}(\sqrt{\log n/m})$ as $m\rightarrow\infty$. This implies that $m\sim\mathcal{O}(s^2)$ would suffice. As we will see, this is less optimal than the uniform recovery condition to be obtained in the case of relaxation methods which only requires logarithmic oversampling than $s$, but can be improved without asking for uniformity, see \cite{tropp2007signal} and \cite{cohen2009compressed} for more details. 
+
+Other greedy algorithms such as Thresholding (TH), Matching Pursuit (MP), Weak Matching Pursuit and Regularized Orthogonal Matching Pursuit (ROMP) can be found in the book \cite{elad2010sparse} by Elad and the paper \cite{needell2009uniform} by Needell and Vershynin.
+
+Generally, greedy algorithms in CS are quite fast and transparent, both theoretically and experimentally. They work well for highly incoherent measurement matrices and the overall complexity is of order $\mathcal{O}(smn)$. On the other hand, greedy algorithms have weaker guarantees of exact recovery. For example, the condition (\ref{exact-tropp}) depends not only on $\A$ but also the support of $\x_0$, making a lot of analysis of these algorithms non-uniform in nature. This point has been verified in \cite{rauhut2008impossibility} by Rauhut. Even for the non-uniform recovery, as we have seen before, the success of the greedy algorithms heavily relies on that nonzero components in $\x_0$ are bounded away from $0$. These problems together make the greedy algorithms less superior to the other methods with uniform recovery guarantee, when the computational cost is not of the major concern.    
+
+
+
+\subsection{Convex Relaxation Methods}\label{l1-section}
+  
+Compared to the greedy algorithms, the relaxation methods to be introduced in this section are more than just an ad hoc. The idea lies in replacing the sparsity measure $|| \cdot||_0$ with a different objective function which is both sparsity-promoting and computationally convenient. One of the very first ideas, as proposed in \cite{donoho2006compressed}, is the $\ell_1$ norm $|| \cdot||_1$. Note that $|| \cdot||_1$ is a convex function. There are many other relaxation approaches which are also sensitive to detecting sparsity; however, most of them are non-convex in nature and thus postoned to the later sections for detailed discussion. For the time being we shall focus on the $\ell_1$-relaxation only.
+
+To gain some intuition why $|| \cdot||_1$ promotes sparsity, one can plot the level sets of $|| \cdot||_1$ by increasing its radius to see the point it first touches a hyperplane at a general position. It can be seen that the intersection very likely occurs at some vertex of the level set of $|| \cdot||_1$. This motivates the following relaxed version of the original problem (\ref{cs}): 
+\begin{align}
+\min ||\x||_1 \ \ \ \text{subject to}\ \A\x=\A\x_0.\label{l1}
+\end{align}
+In the literature, (\ref{l1}) is often referred to as the \emph{$\ell_1$-minimization problem} or the \emph{Basis Pursuit (BP)}. 
+
+Before going to discuss how (\ref{l1}) is related to (\ref{cs}), we need to make sure that (\ref{l1}) is computationally feasible. The following theorem tells us that (\ref{l1}) is equivalent to a standard linear programming problem. 
+
+\begin{Th}\label{Linear programming}
+The solution to (\ref{l1}) is the same as the solution to the linear programming problem
+\begin{align}
+\min \mathbf{1}^T\x \ \ \ \text{subject to}\ [\A, -\A]\x=\b, \ \x\geq \mathbf{0},\label{l1-LP}
+\end{align}
+where $\mathbf{1}=(1, \cdots, 1)^T\in\R^{2n}$. 
+\end{Th}
+\begin{proof}
+The desired result follows easily by rewriting $\x$ in the original problem into the difference of its postive and negative parts: $\x=\x^+-\x^-$, and rewrite it into the linear programming form.   
+\end{proof}
+
+Theorem \ref{Linear programming} ensures that (\ref{l1}) can be solved relatively efficiently (compared to $|| \cdot||_0$). It is therefore desired to understand when (\ref{l1}) and (\ref{cs}) are equivalent. An answer to this question first appeared in a series of work by Cand\`es and Tao, see \cite{emmanuel2004robust} and \cite{candes2004near}, and was later completely resolved in the seminal paper \cite{cohen2009compressed} by Cohen, Dahmen and DeVore in the study of best $k$-term approxiamtion. In order to introduce their results, we need a few more definitions:
+
+\begin{Def}[Null Space Property, or NSP]
+$\A\in\R^{m\times n}$ is said to satisfy the null space property with parameter $(k, c)$ with respect to the norm $|| \cdot||_X$ if 
+\begin{align}
+||\h_T||_X< c||\h_{T^c}||_X\ \ \ \forall \h\in\ker(\A),\label{NSP}
+\end{align}
+and $T\subset\{1,\cdots, n\}$ with $|T|\leq k$.  
+\end{Def}
+In the general framework in \cite{cohen2009compressed}, (\ref{NSP}) is used to give a necessary and sufficient condition for the existence of decoder whose approximation error is comparable to the best $k$-term approximation error of $\x_0$ ($\x_0$ is a general vector and not necessarily sparse in their discussion) under the $\ell_p (p\geq 1)$ norm. In many other literature, NSP is simply defined by default with $|| \cdot||_X=|| \cdot||_1$. In the following discussion, we shall adopt this definition unless stated otherwise.  
+
+NSP gives a necessary and sufficient condition (up to a constant) for the equivalence between (\ref{l1}) and (\ref{cs}), and this is given by the following Theorem:
+
+\begin{Th}[Exact Recovery Guarantee for $\ell_1$]\label{NSP-Th}
+Suppose that $\A\in\R^{m\times n}$ satisfies NSP with parameters $(s, 1)$. Then, (\ref{l1}) and (\ref{cs}) are equivalent for all $\x_0$ with $||\x_0||_0\leq s$. On the other hand, if (\ref{l1}) and (\ref{cs}) are equivalent for all $\x_0$ with $||\x_0||_0\leq s$, then $\A$ must satisfy NSP with parameters $(2s,1)$.  
+\end{Th} 
+\begin{proof}
+We start by proving the first direction. Denote the support of $\x_0$ by $S$. First note that by solving (\ref{cs}) one can always recover $\x_0$ according to Theorem \ref{spark}. Therefore, it only remains to show that (\ref{l1}) can also recover $\x_0$ if $\A$ satisfies NSP with parameters $(s,1)$. This comes down to checking that $\x_0$ has the smallest $\ell_1$ norm among all the solutions in the feasible region. Indeed, for any $\x$ satisfying $\A\x=\A\x_0$, $\x-\x_0\in\ker(\A)$ and 
+\begin{align*}
+||\x||_1&=||(\x_0+\x-\x_0)_S||_1+||(\x-\x_0)_{S^c}||_1\\
+&\geq ||\x_0||_1-||(\x-\x_0)_S||_1+||(\x-\x_0)_{S^c}||_1\\
+&>||\x_0||_1. 
+\end{align*} 
+The other direction follows from a contradiction argument. Suppose that $\A$ does not satisfy NSP with parameters $(2s,1)$. Then there exists an $\h\in\ker(\A)$ such that $||\h_S||_1>||\h_{S^c}||_1$, where $S$ is the set where the largest $s$ components (in magnitude) of $\h$ reside. Taking $\x_0=\h_S$ will yield a contradiction.   
+\end{proof}
+
+Theorem \ref{NSP-Th} shows the importance of NSP if one wishes to use the $\ell_1$ minimization solution as the decoder for $\x_0$. Nevertheless, it is not yet known how to generate matrices with desired NSP condition. To make the problem (\ref{l1}) easier to analyze, another definition called \emph{Restricted Isometry Property (RIP)} was proposed in \cite{candes2004near} and shortly gained its popularity across the field.  
+
+\begin{Def}[Restricted Isometry Property, or RIP]
+$\A\in\R^{m\times n}$ is said to satisfy the restricted isometry property with parameters $(k, \delta)$ if for any $T\subset\{1, \cdots, n\}$ with $|T|= k$, the restriction of $\A$ to $T$ satisfies
+\begin{align}
+(1-\delta)||\x||^2_2\leq ||\A_S\x||^2_2\leq (1+\delta)||\x||^2_2, \ \ \ \forall\x\in\R^k. 
+\end{align}
+In other words, $\A$ is almost an isometry once restricted to any subcolumns of size less than $s$.  
+\end{Def}
+
+Intuitively, RIP is a uniform version of coherence. This is made clear by the following lemma. 
+
+\begin{Lemma}
+Suppose that $\A$ satisfies RIP with parameters $(k, \delta)$. Let $S_1, S_2$ be two disjoint subsets of $\{1, \cdots, n\}$ with $|S_1|+|S_2|\leq k$. For any two vectors $\x_1\in\R^{|S_1|}$ and $\x_2\in\R^{|S_2|}$,
+\begin{align}
+|\x^T_1\A^T_{S_1}\A_{S_2}\x_2|\leq \delta||\x_1||_2||\x_2||_2.\label{cross}
+\end{align}
+Particularly, by setting $\x_2 = \A^T_{S_2}\A_{S_1}\x_1$, (\ref{cross}) implies  
+\begin{align}
+||\A^T_{S_2}\A_{S_1}||_2\leq \delta.
+\end{align}
+\end{Lemma} 
+
+\begin{proof}
+Define $\tilde{\x_1} = (\x_1, 0)^T$ and $\tilde{\x}_2 = (0, \x_2)^T$. The left-hand side of (\ref{cross}) can be written as $$\tilde{\x}^T_1(\A^T_{S_1\cup S_2}\A_{S_1\cup S_2}-\mathbf{I_{|S_1\cup S_2|}})\tilde{\x}_1,$$ 
+where $I_{|S_1\cup S_2|}\in\R^{|S_1\cup S_2|\times |S_1\cup S_2|}$ is the identity matrix. The RIP assumption does the rest.  
+\end{proof}   
+
+
+The next Theorem tells us that RIP implies NSP. 
+
+\begin{Th}\label{RIP-NSP}
+If $\A$ satisfies RIP with parameters $(2k, \delta)$ with $\delta\leq 1/3$, then $\A$ satisfies NSP with parameters $(k, 1)$. 
+\end{Th}
+As the proof of Theorem \ref{RIP-NSP} is widely applicable to analyzing many other variants of convex relaxation schemes, we will give it here following the quick approach in \cite{rauhut2010compressive}.  
+\begin{proof}
+Let $\h\in\ker(\A)$. Without loss of generality we may assume that the components of $\h$ are arranged in decreasing magnitude. For $r\in\N$, $S_r$ denotes the set $\{(r-1)k+1, \cdots, rk\}$. By definition, 
+\begin{align*}
+\frac{1-\delta}{\sqrt{s}}||\h_{S_1}||_1||\h_{S_1}||_2\leq (1-\delta)||\h_{S_1}||_2^2\leq||\A_{S_1}\h_{S_1}||_2^2&=-\sum_{r\geq 2}\langle \A_{S_r}\h_{S_r}, \A_{S_1}\h_{S_1}\rangle\\
+&\leq \delta ||\h_{S_1}||_2\sum_{r\geq 2}||\h_{S_r}||_2\\
+&\leq \delta ||\h_{S_1}||_2\sum_{r\geq 1}\frac{1}{\sqrt{s}}||\h_{S_r}||_1,
+\end{align*}
+where the first inequality used (\ref{cross}). Rearranging terms gives
+\begin{align*}
+(1-\delta)||\h_{S_1}||_1<\delta||\h_{S_1^c}||_1, 
+\end{align*}
+which implies
+\begin{align*}
+||\h_{S_1}||_1<\frac{\delta}{1-2\delta}||\h_{S_1^c}||_1\leq ||\h_{S_1^c}||_1. 
+\end{align*}
+The proof is complete.    
+\end{proof}
+For upper bound $1/3$ is not optimal. More accurate constants could be found in \cite{foucart2013invitation}. The following corollary follows immediately from Theorem \ref{NSP-Th} and Theorem \ref{RIP-NSP}. 
+
+\begin{Cor}
+(\ref{l1}) and (\ref{cs}) are equivalent for all $\x_0$ with $||\x_0||_0\leq s$ if $\A$ satisfies the RIP with parameters $(2s, 1/3)$.  
+\end{Cor}
+
+A more general result of the $\ell_1$ minimization in the presence of noise was given in \cite{candes2006stable}. The idea is similar to the $k$-block strategy used in Theorem \ref{RIP-NSP} and we state the main Theorem without  proof. 
+
+\begin{Th}\label{CT-stability}
+Suppose that $\A$ satisfies the RIP with parameters $(2s, 0.465)$ for some $s>0$. Let $\tilde{\x}$ be the solution to the following minimization problem:
+\begin{align*}
+\min ||\x||_1 \ \ \ \text{subject to}\ ||\A\x-\b||_2\leq\e,
+\end{align*}
+where $\b = \A\x_0+\mathbf{e}$ with $||\mathbf{e}||_2\leq\e$. $\x_0$ is a general vector in this case. Then,
+\begin{align*}
+||\tilde{\x}-\x_0||_2\leq c\e+\frac{d}{\sqrt{s}}\sigma_s(\x_0)_1,
+\end{align*}
+where $\sigma_s(\x_0)_1$ is the best $s$ term approximation error of $\x_0$ under the $\ell_1$ norm.    
+\end{Th} 
+
+Theorem \ref{RIP-NSP} teaches us that RIP is at least as strong as NSP. In fact, it was shown in \cite{cahill2016gap} that RIP is strictly stronger. This can also be seen from a simple fact: NSP condition is invariant by multiplying $\A$ by an invertible matrix, yet the same is not true for RIP. However, compared to NSP, RIP is a property concerned with the extreme singular values of the submatrices of $\A$, which can be well estimated in many situations of interest. This is particularly true when $\A$ is drawn from a random set-up. The following result quantifies this point. For details of the proof, see \cite{baraniuk2008simple} and \cite{rudelson2008sparse}.
+
+\begin{Th}\label{random matrix estimate}
+Let $\A\in\R^{m\times n}$ be a random matrix. 
+\begin{enumerate}
+\item If $\A$ is a subgaussian matrix, with overwhelming probability, $\A/\sqrt{m}$ satisfies RIP with parameters $(s, \delta)$ if $m\gtrsim \delta^{-2}s\log(n/s\delta^2)$.
+
+\item If $\A$ is a partial bounded orthogonal matrix, with overwhelming probability, $\sqrt{n}\A/\sqrt{m}$ satisfies RIP with parameters $(s, \delta)$ if $m\gtrsim \delta^{-2}s\log^5 n$.  
+\end{enumerate}
+\end{Th} 
+
+Using the types of measurement matrices in Theorem \ref{random matrix estimate}, the $\ell_1$ minimization can exactly recover all $\x_0$ with $||\x_0||_1\leq s$ as long as the sampling rate $m$ is logarithmically larger than the sparsity level $s$. This gives the uniform recovery guarantee for the $\ell_1$ minimization method in sparse recovery. Meanwhile, it was shown in \cite{davenport2010analysis} that (\ref{exact-tropp}) holds for all $|S|\leq s$ if $\A$ satisfies RIP with parameters $(s, \delta_s)$ where $\delta_s\sim s^{-1/2}$.    In other words, $m$ needs to be of order $\mathcal{O}(s^2\log n)$ to guarantee uniform exact recovery for OMP. This is consistent with the result in Theorem \ref{unif-OMP}. This analysis was empirically known to be sharp. Therefore, from a methodogical point of view, $\ell_1$ minimization is superior to most greedy algorithms. 
+
+The obvious drawback, however, is the inevitable increase in computational complexity of the algorithm. It is not very clear what the exact running time for $\ell_1$ minimization is, since there is no strongly polynomial time algorithm in linear programming yet.   Besides, the hidden constants in the estimates make the sampling bounds of little use in practice. For this, it was observed and studied by Donoho and Tanner in \cite{donoho2005neighborliness} that the $\ell_1$ minimization exhibits a phase transition phenomenon. When the sparsity level is below some threshold the $\ell_1$ minimization can exactly recover the sparsest solution with high probability. Yet if the sparsity level surpasses that threshold, $\ell_1$ minimization would fail to find the sparsest solution with an overwhelming chance. Understanding when the phase transition phenomenon occurs can hopefully help us understand these unknown constants better, see \cite{donoho2006high}, \cite{donoho2005neighborliness} and \cite{donoho2009counting} for more details. This also illustrates some intrinsic limitation of using $\ell_1$ norm in sparse recovery, especially when the sampling rate is lower than obtainable. In such case, a more robust method is called for.    
+
+
+\section{A Geometric Perspective on $\ell_1$ Minimization}
+
+Through the $\ell_1$ minimization approach, the relaxed problem (\ref{l1}) itself allows for interpretations from different perspectives. In this section, we will mainly introduce several different views based on \cite{vershynin2015estimation} and  \cite{zhang2013theory}. As we will see, they provide valuable insight for our study of (\ref{cs}) in the case of non-convex relaxation.     
+
+ 
+To interprete (\ref{l1}) geometrically, we assume that entries of $\A$ are iid standard normal, which is denoted by $\mathcal{N}(0,1)$. This assumption will endow the constraint $\A\x=\b$ with some geometric flavor; the constraint imposes that $\x$ belongs to a translated subspace uniformly drawn from the Grassmanian $G_{n,n-m}$. The objective function, on the other hand, can be considered as a symmetric convex body, i.e., the $\ell_1$ ball in $\R^n$. Therefore, (\ref{l1}) is associated to a problem of understanding the section of a random subspace with a convex set in $\R^n$. 
+
+We began by introducing the approach in \cite{vershynin2015estimation}.    Visualization of convex sets in high dimensions often depends on two parts: the bulk and the outliers. The bulk is the biggest inscribed part of a convex set that resembles a round ball, and the outliers are those points contributing to the diameter of a convex set. Intuitively, the low-dimensional random section of a convex set tends to avoid the outliers, and the resulting shape is close to an Euclidean ball. As the dimension increases, the random section is more likely to capture the outliers, and the diameter of the intersected region will grow in a certain manner depending on the geometry of the convex set. The following two Theorems give a quantitative statement for what we described above. 
+
+\begin{Th}[Low-Dimensional Section: Dvoretzky's Theorem]\label{T1}
+Let $K$ be a symmetric convex body in $\R^n$ such that the biggest ellipsoid incribed in it is the unit Euclidean ball. Let $E$ be a random subspace drawn uniformly from $G_{n,d}$ with $d\sim \e^2\log n$. Then there exists $R>0$ and with high probability, say $0.99$, 
+\begin{align}
+(1-\e)B(R)\subset K\cap E\subset (1+\e)B(R),
+\end{align}
+where $B(R)$ is the Euclidean ball of radius $R$ in $E$. The $\e^2\log n$ can be improved to $\e^2 n$ when $K$ is the $\ell_1$ ball with radius $\sqrt{n}$, and in this case $R=1$.   
+\end{Th}
+
+\begin{Th}[High-Dimensional Section: $M^*$-bound]\label{T2}
+Let $K$ be a bounded subset of $\R^n$. Let $E$ be a random subspace drawn uniformly from $G_{n,n-m}$. Then, 
+\begin{align}
+\E\sup_{\u\in K\cap E}||\u||_2\leq \sqrt{\frac{8\pi}{m}}\cdot\E\sup_{\u\in K}|\langle \g,\u\rangle|,\label{5}
+\end{align}
+where $\g\sim\mathcal{N}(\mathbf{0},\mathbf{I}_n)$. 
+\end{Th}
+The proof Theorem \ref{T2} can be found in \cite{vershynin2018high}, and its corresponding high-dimensional probabilistic statement will be crucial in the proof of the practicality part of our result. The quantity $\E\sup_{\u\in K}|\langle \g,\u\rangle|$ on the right-hand side of (\ref{5}) is closely related to the concept of gaussian width or the gaussian complexity of a set $K$:
+\begin{Def}
+Let $K$ be a bounded set in $\R^n$. The gaussian complexity of $K$ is defined by $w(K)=\E\sup_{\x\in K}\langle\g, \x\rangle$, where $\g\sim\mathcal{N}(\mathbf{0},\mathbf{I}_n)$. The gaussian width of $K$ is defined as $w'(K)=w(K-K)$. 
+\end{Def}
+
+
+Indeed, in the case where $K$ is a symmetric convex body centered at the origin, (\ref{5}) implies that
+\begin{align}
+\E\diam(K\cap E)\leq 2\E\sup_{\u\in K\cap E}||\u||_2\leq \sqrt{\frac{8\pi}{m}}\cdot 2\E\sup_{\u\in K}\langle \g,\u\rangle=\sqrt{\frac{8\pi}{m}}\cdot w'(K). \label{6}
+\end{align}   
+Note that $\sup_{u\in K-K}\langle \g,\u\rangle$ is the distance between two hyperplanes (with normal direction $\g$) that exactly sandwich $K$. $w'(K)$ can therefore be interpreted as the average width of $K$ under the gauss measure, which is a geometric attribute of $K$ measuring its complexity. As was observed in \cite{vershynin2015estimation},  Theorem \ref{T2} implies the following average relative recovery error estimate of the $\ell_1$: 
+\begin{Th}
+Let that $\x^*$ be the solution to (\ref{l1}). Then, 
+\begin{align}
+\E\frac{||\x^*-\x_0||_2}{||\x_0||_2}\lesssim \sqrt{\frac{s\log n}{m}}\label{2}
+\end{align}
+\end{Th} 
+
+\begin{proof}
+Let $K_1=||\x_0||_1\cdot B^n_1$. By definition, $\x^*\in K_1$. Therefore, $\x^*-\x_0\in (K_1-K_1)\cap\ker(\A)$. It follows immediately from (\ref{6}) with $K=K_1-K_1$ and $E=\ker(\A)$ that
+\begin{align*}
+\E||\x^*-\x_0||_2\leq\E\text{\diam}(K_1\cap E)\leq \sqrt{\frac{8\pi}{m}}\cdot w'(K)&\leq \sqrt{\frac{32\pi}{m}}\cdot w'(K_1)\\
+&\lesssim ||\x_0||_1\cdot\sqrt{\frac{\log n}{m}}\\
+&\lesssim ||\x_0||_2\cdot\sqrt{\frac{s\log n}{m}},
+\end{align*}  
+where the last inequality follows from that $||\x_0||_0\leq s$ and the Cauchy-Schwartz inequality. Dividing $||\x_0||_2$ on both sides finishes the proof. 
+\end{proof}
+Taking $m\gtrsim s\log n$ can bound the right-hand side of (\ref{2}) to any arbitrary small number. This condition is consistent with the result given by Theorem \ref{random matrix estimate}. The statement here is slightly weaker since the recovery is not exact but on the average relative error. One can go further to obtain the exact recovery result using the Gordan's Escape Theorem. But as the idea highly relies on the convex nature of problem and is less extentable to the non-convex cases, we do not state it here. For more details, see \cite{vershynin2015estimation} and \cite{rudelson2008sparse}. 
+
+In \cite{zhang2013theory}, Zhang took a slightly different approach to analyzing the exact recovery condition for the $\ell_1$ minimization. His methodology relies heavily on interpretating the null space of $\A$ as a random subspace under the Gaussian assumption of the measurement and is RIP-free. By using such a approach, he was able to obtain most of the results in the RIP case as well as something beyond. Since Zhang's analysis provides us with the original inspiration, we shall give the main results in \cite{zhang2013theory}. 
+
+First of all, Zhang noticed that a sufficient condtion for the NSP with paramaters $(s,1)$ is given by
+\begin{align}
+\inf_{0\neq\h\in\ker(\A)}\frac{||\h||_1}{||\h||_2}>2\sqrt{s}.\label{zhang-l1-l2} 
+\end{align} 
+The condition (\ref{zhang-l1-l2}) is concerned with the difference between the $\ell_1$ and $\ell_2$ norm in a random subspace of dimension $n-m$, which can be analyzed under the theory of high-dimensional geometry. Indeed, a classical result (\cite{gluskin1984norms},  \cite{kasin1977widths}) by Kashin, Garnaev and Gluskin in geometric function analysis states that if the mesurement $\A$ is Gaussian, 
+\begin{align}
+\inf_{0\neq\h\in\ker(\A)}\frac{||\h||_1}{||\h||_2}>\frac{c\sqrt{m}}{\sqrt{1+\log (n/s)}}\label{KGG}
+\end{align}
+holds with overwheliming probability, where $c$ is some dimension-free constant. (\ref{zhang-l1-l2}) and (\ref{KGG}) together give a bound on $m$ which is asymptotically equivalent to the result in Theorem \ref{random matrix estimate}. 
+
+Meanwhile, a similar ratio condition like (\ref{zhang-l1-l2}) is given in \cite{zhang2013theory} to guarantee that the $\ell_1$ minimization is stable in some sense. A specific case of the result reads as follows:
+\begin{Th}\label{zhang-stability}
+Let $\tilde{\x}$ be the solution to the following minimization problem:
+\begin{align*}
+\min ||\x||_1 \ \ \ \text{subject to}\ ||\A\x-\b||_2\leq\e,
+\end{align*}
+where $\b = \A\x_0+\mathbf{e}$ with $||\mathbf{e}||_2\leq\e$ and $||\x_0||_0\leq s$. Let $\u$ and $\w$ be the orthogonal projection of $\tilde{\x}-\x_0$ to $\ker(\A)$ and $\ker^\perp(\A)$, respectively. If 
+\begin{align*}
+s=\frac{v^2}{4}\frac{||\u||_1^2}{||\u||_2^2}
+\end{align*}
+for some $v\in (0, 1)$. Then, either for $p=1$ or $p=2$,
+\begin{align*}
+||\tilde{\x}-\x_0||_p\leq 2\gamma_p\left(1+\frac{1+v\sqrt{2-v^2}}{1-v^2}\right)||\w||_2, 
+\end{align*}
+where $\gamma_1=\sqrt{n}$ and $\gamma_2=1$. 
+\end{Th}
+It was also shown in \cite{zhang2013theory} that $||\w||_2$ can be further bounded by $||R^{-T}||_2\e$, where $R$ comes from the QR decomposition of $A^T$. It is worth noting that even though Theorem \ref{zhang-stability} may seem more complicated and less optimal, it is not contained in the RIP result such as Theorem \ref{CT-stability}. In fact, the constants involved in Theorem \ref{zhang-stability} are more revealing since they are directly related to the sparsity level $s$ rather than the RIP parameters, which are not invariant under invertible transforms. We note that Zhang also studied the universal recoverability concerning the ratio condition he proposed in exact recovery, but we will not go into details here.    
+
+
+
+\section{Non-convex Optimization: An Alternative Approach}
+
+
+Although the $\ell_1$ minimization has a sound theory to guarantee for exact recovery, it has been gradually felt in practice that it is not robust enough to promote sparsity. This drives researchers to search for other possible sparsity-aware objective functions other than the $\ell_1$ norm. Such quest began shortly after the theory of the $\ell_1$ minimization was fully understood, and still remains an active area of research today that attracted people from both mathematics and engineering. The major challenge, however, is that many of the sparsity-promoting functions are non-convex in nature, leading to difficulties in proving the exact recovery condition as well as devising algorithms with explicitly known convergence guarantee. Yet many of them give substantially better empirical results than the $\ell_1$, which makes it worth investigating the theoretical aspect of these alternatives. In this section, we give a brief review on the major breakthroughs in the study of non-convex optimization in sparse recovery. 
+
+\subsection{$\ell_q$ ($0<q\leq 1$) Minimization }
+
+Using the quasinorm $|| \cdot||_q$ ($0<q\leq 1$) in the study of sparse recovery is not completely unexpected. Following the level set intuition mentioned at the beginning of Section \ref{l1-section}, it is easy to see that the $\ell_q$ ball is more likely to touch the hyperplane $\A\x=\b$ with its vertices (which correspond to the sparse points), as the boundary of the ball is concave away from the hyperplane. Also, from an analytic perspective, for any $\x\in\R^n$, 
+\begin{align*}
+||\x||_0 = \lim_{q\rightarrow 0}||\x||^q_q=\lim_{q\rightarrow 0}\sum_{i=1}^n|x_i|^q. 
+\end{align*}
+This implies that $|| \cdot||_q$ provides a better approximation to $|| \cdot||_0$ than $|| \cdot||_1$ when $q$ is less than $1$. Both the geometric and analytic evidence suggests that $\ell_q$ should have a better performance than the $\ell_1$. 
+
+Similar to (\ref{l1}), the $\ell_q$ relaxation of (\ref{cs}) can be formulated as as follows:
+\begin{align}
+\min ||\x||_q \ \ \ \text{subject to}\ \A\x=\A\x_0.\label{lq}
+\end{align}
+The study of (\ref{lq}) in terms of coherence first appeared in the work \cite{gribonval2007highly} by Gribonval and Nielson. Almost at the same time, Chartrand analyzed the same problem in \cite{chartrand2007exact} using the RIP condition. The analysis was further extended  by Foucart and Lai in \cite{foucart2009sparsest} based on a ratio condition which is less stringent compared to the RIP.   
+
+Before stating the main results concerning the exact recovery for the $\ell_q$ minimization in \cite{foucart2009sparsest}, we note that our previous analysis of the $\ell_1$ minimization does not directly pass to the case of $\ell_q$ minimization, since $|| \cdot||_q$ does not satisfy the triangle inequality. However, taking a closer look it is not hard to see that the solution to (\ref{lq}) remains the same if $|| \cdot||_q$ is replaced by $|| \cdot||_q^q$. But $|| \cdot||_q^q$ satisfies the triangle inequality. This is stated as the Lemma below:
+\begin{Lemma}\label{tau-triangle}
+For any $\x, \y\in\R^n$ and $q\in (0,1]$, 
+\begin{align*}
+||\x+\y||_q^q\leq ||\x||_q^q+||\y||_q^q. 
+\end{align*} 
+\end{Lemma}  
+\begin{proof}
+Let $\x=(x_1, \cdots, x_n)^T$ and $\y=(y_1, \cdots, y_n)$. For each $i\leq n$, it follows from direct computation that
+\begin{align*}
+1&=\frac{|x_i|}{|x_i|+|y_i|}+\frac{|y_i|}{|x_i|+|y_i|}\\
+&\leq\left(\frac{|x_i|}{|x_i|+|y_i|}\right)^q+\left(\frac{|y_i|}{|x_i|+|y_i|}\right)^q,
+\end{align*}
+or equivalently,
+\begin{align*}
+|x_i+y_i|^q\leq (|x_i|+|y_i|)^q\leq |x_i|^q+|y_i|^q
+\end{align*}
+Summing over $i$ from $1$ to $n$ yields the desired result.  
+\end{proof}
+The exact recovery condition for (\ref{lq})
+is the following:
+\begin{Th}\label{lq recovery}
+Let $s$ be a fixed number. Suppose for some $t\geq s$ there exist $\beta_{2t}\geq\alpha_{2t}>0$ such that $\A$ satisfies 
+\begin{align*}
+\alpha_{2t}||\x||_2\leq ||\A\x||_2\leq\beta_{2t} ||\x||_2
+\end{align*}
+for all $\x$ with $||\x||_0\leq 2t$. Then the solution to (\ref{lq}) recovers all $s$-sparse solutions $\x_0$ if
+\begin{align}
+\frac{\beta_{2t}^2}{\alpha_{2t}^2}<4(\sqrt{2}-1)\left(\frac{t}{s}\right)^{1/q-1/2}.\label{lq-con}
+\end{align} 
+\end{Th}
+By choosing $t=s+1$, one can always find a sufficiently small $q$ such that (\ref{lq-con}) holds as long as $\alpha_{2t}>0$. Note that $\alpha_{2t}>0$ holds if and only if $2t=2(s+1)<\text{spark}(\A)$. This almost recovers the condition in Theorem \ref{spark}. A more complete version of Theorem \ref{lq-con} in the presence of noise can be found in \cite{foucart2009sparsest}.  
+
+Theorem \ref{lq recovery} gives a weaker exact recovery condition for (\ref{lq}) than the $\ell_1$, and the condition itself converges to the one for the $\ell_0$ as $q$ decreases to $0$. This is consistent with our heuristic discussion at the beginning. However, for practical considerations, efficient algorithms are desired for solving the $\ell_q$ minimization, and the best-known of them is the \emph{Iterative Reweighted Least Squares}, or IRLS. The idea lies in first rewriting $||\x||_q$ into a weighted $\ell_2$ norm of $\x$: $||\mathbf{X}_q(\x)\x||_2$, where $\mathbf{X}_q(\x)$ is a weight matrix depending on $\x$, and then use an iterative scheme to update $\mathbf{X}_q(\x)$ and $\x$ alternatingly. The hope is that the algorithm will finally reach its fixed point.    
+
+The IRLS first appeared in the PhD thesis of Lawson in \cite{lawson1961contribution} for solving uniform approximation problems and was later analyzed by Cline in \cite{cline1972rate}. It was introduced into the field of CS by Gorodnitsky and Rao in \cite{gorodnitsky1997sparse}, and was later improved by Chartrand and Yin in \cite{chartrand2008iteratively} by adding a regularizing parameter. The first comprehensive convergence analysis of the IRLS for solving (\ref{lq}) was given in the seminal paper \cite{daubechies2010iteratively} by  Daubechies and others. It was then extended to the general unconstrained case by Lai and Yin in \cite{lai2013improved}. 
+
+The full convergence analysis in \cite{daubechies2010iteratively} is not stated here, but the main results are as follows. First of all, a regularizing parameter is needed in the reweighting step $\mathbf{X}(\x)$ to make the algorithm work smoothly. Moreover, in order to show the convergence of the IRLS, the regularizing parameter must be updated stepwise together with the NSP parameters. Such parameter tuning process is often not so easy in practice since the NSP information is not known as a prior; one can choose a decreasing sequence of the parameters to guarantee good empirical performance, see \cite{foucart2009sparsest}. Secondly, there is no guarantee for the algorithm to converge to the global minimum in general but only to some stationary point due the non-convex nature of the problem. However, if at some step in the iteration that the approximate solution is close enough to $\x_0$, then it can be shown that the algorithm will converge to $\x_0$ with superlinear rate in the future interates.      
+
+\subsection{Reweighted $\ell_1$ Minimization}
+
+The \emph{Reweighted $\ell_1$ Minimization} method was first proposed by Cand\`es, Wakin and Boyd in \cite{candes2008enhancing}. The main idea is still around the $\ell_1$ minimization but uses a reweighted scheme at the same time to reduce the bias of the $\ell_1$ norm towards the large components. The algorithm is similar to the IRLS algorithms for solving $\ell_q$ minimization problems in previous section. The difference, however, is that each time it needs to solve a linear programming problem rather than a least-squares problem. We will first briefly explain how the reweighted $\ell_1$ algorithm works and then point out a connection to the general \emph{Majorization Minimization} (MM) algorithms.
+
+The intuition behind the reweighted $\ell_1$ minimization is as follows. The sparsity measure $|| \cdot||_0$ is impartial for all non-zero components in a vector, while $|| \cdot||_1$ tends to penalize more on those with a higher magnitude. In the case where $\x_0$ has varing magnitude, the $\ell_1$ minimization solution may fall out of accuracy. To address this issue, we can reweight the $\ell_1$ norm so that it sees the vector just as $\ell_0$ does. To be precise, let $\x_0=(x^0_1, \cdots, x^0_n)^T\in\R^n$. For any $\x = (x_1, 
+\cdots, x_n)^T\in\R^n$, define its weighted $\ell_1$ norm by 
+\begin{align*}
+||\x||_{w,1}:=\sum_{i=1}^n\frac{|x_i|}{|x_i^0|}.
+\end{align*} 
+The reweighted $\ell_1$ minimization can therefore be stated as 
+\begin{align}
+\min ||\x||_{w,1} \ \ \ \text{subject to}\ \A\x=\A\x_0.
+\end{align}
+There are two problems. First of all, $\x_0$ is unknown so the weights are not computable. Secondly, the weights divided by $x^0_i$ which are zero may lead to singuarities. The solution for the first problem is to make the algorithm iterative. That is, supposing an approximate solution $\x_k$ is known to be close to $\x_0$, one can use the information of $\x_k$ for the weights and update $\x_k$ by solving the weighted $\ell_1$ minimization under the weights given by $\x_k$. The second problem can be solved by introducing some regularizing parameter $\e>0$. This leads to the following formulation of the reweighted $\ell_1$ minimization:
+\begin{align}
+\x_{k+1}=\arg\min_{\A\x=\A\x_0} ||\x||_{w_k,1},\label{re-l1}
+\end{align}
+where 
+$$||\x||_{w_k,1}:=\sum_{i=1}^n\frac{|x_i|}{|x_i^k|+\e}$$
+and $\x_k = (x_1^k, \cdots, x_n^k)^T\in\R^n$. The initial value is usually chosen as the regular $\ell_1$ minimizer for a good start. The parameter $\e$ can also be updated stepwise to make the algorithm more efficient in some situations, see \cite{candes2008enhancing}.
+
+The recursive formula can also be interpreted from the view of MM algorithms. To see this, consider replacing $|| \cdot||_0$ with a slightly different sparsity-promoting function:
+\begin{align*}
+||\x||_0\sim\sum_{i=1}^n\log(|x_i|+\e). 
+\end{align*}
+Note that $\sum_{i=1}^n\log(|x_i|+\e)$ is a concave function in $\x$, which therefore can be majorized by its linearization at $\x_0$. However, since $\x_0$ is unknown, one starts from some initial guess and updates it step by step, and this recovers the recursive formula (\ref{re-l1}).
+
+There is not yet a comparable convergence analysis compared to the one in \cite{daubechies2010iteratively}. But based on the original motivation and empirical evidence, the reweighted $\ell_1$ minimization tends to have an obvious edge when the magnitude of $\x_0$ varies widely. In the case where the components of $\x_0$ are of similar magnitude, the reweighted $\ell_1$ and the $\ell_1$ are on the same par.      
+
+\subsection{Iterative Hard-thresholding (IHT)}
+
+The \emph{Iterative Hard-thresholding} (ITH) algorithm is closely related to many greedy algorithms introduced before, such as the \emph{Regularized Orthogonal Matching Pursuit} (ROMP) in \cite{needell2009uniform}  and a more advanced version of OMP called \emph{Compressive Sampling Matching Pursuit} (CoSaMP) in \cite{needell2009cosamp}. It was first introduced by Blumensas and Davies in \cite{blumensath2009iterative}. Compared to the analysis of ROMP and CoSaMP, ITH was analyzed from the point of view of optimization which is generally applicable to many other situations. Therefore it is worth introducing the ideas behind it. 
+
+Since the IHT is of greedy pursuit in nature, it does not relax the sparsity measure $|| \cdot||_0$ into some other sparsity-promoting function with better regularity properties. Instead, it directly works with (\ref{cs}) and treats it as a non-convex optimization problem. It was observed in \cite{blumensath2009iterative} that by reversing the objective function and the constraint, (\ref{cs}) is equivalent to 
+\begin{align}
+\min \frac{1}{2}||\A\x-\b||_2^2 \ \ \ \text{subject to}\ ||\x||_0\leq s.\label{IHT}
+\end{align}
+Note that (\ref{IHT}) is an optimization problem with a convex objective function and a non-convex feasible region defined by the sparsity level $s$. This makes the \emph{Generalized Gradient Project Descent} (gGPD) a natural choice for solving (\ref{IHT}), see \cite{jain2017non} for more details. In fact, the special structure of the set $||\x||_0\leq s$ makes the projection step fairly easy. 
+
+The IHT algorithm based on the gGPD can be roughly described as follows:
+\begin{enumerate}
+\item Start with some initial guess for $\x$ in the feasible region;
+\item Update $\x$ by gradient descent of step length $\eta$: $\x\leftarrow \x-\eta\cdot\frac{1}{m}\A^T(\A\x-\b)$.  
+\item Project the $\x$ in step 2 to the feasible set $||\x||_0\leq s$. This suffices to taking the best $s$-term approximation of $\x$. 
+\item If the iterative step reaches some threshold $N$, then stop. Otherwise return to the step 2. 
+\end{enumerate}  
+
+The convergence of the IHT is guaranteed by a condtion characterized by the strong smoothness and strong convexity of the objective function.
+\begin{Def}
+A differentiable function $f:\R^n\rightarrow\R$ is considered $\alpha$-strongly convex and $\beta$-strongly smooth if for $\x, \y\in\R^n$,
+\begin{align}
+\frac{\alpha}{2}||\x-\y||_2^2\leq f(\y)-f(\x)-\langle\nabla f(\x), \y-\x\rangle\leq\frac{\beta}{2}||\x-\y||_2^2.\label{scsm} 
+\end{align}
+\end{Def}
+Intuitively, large $\alpha$ implies that $f$ majorizes a stricly convex parabola, ensuring enough decay when moving away from $\x$. Small $\beta$ implies that  the gradient of $f$ changes in a Lipschitz way, ensuring enough decay when moving near $\x$. The convergence result of IHT is given in the following theorem:
+\begin{Th}\label{IHT-1}
+Suppose that $f(\x)=\frac{1}{2}||\A\x-\b||_2^2$ satisfies (\ref{scsm}) with $\beta/\alpha<2$. Take $\eta=\beta^{-1}$ and threshold iterative level $N=\mathcal{O}\left(\frac{\alpha}{2\alpha-\beta}\log(\frac{1}{\e})\right)$. Then the $N$-th iterate $\x^{(N)}$ satisfies 
+\begin{align}
+f(\x^{(N)})\leq\e. 
+\end{align} 
+\end{Th}
+In the case of $f(\x)=\frac{1}{2}||\A\x-\b||_2^2$, (\ref{scsm}) is almost equivalent to the RIP condition written in a ratio form. However, Theorem \ref{IHT-1} only tells us that $f(\x^{(N)})$ is close to the optimal value but not $\x^{(N)}$. In order to infer $\x^{(N)}$ from $f(\x^{(N)})$, it is necessary to require that the gradient of $f$ is lower bounded away from $0$. This is the same as to have a lower bound on $||\A\x||_2$ for all sparse $\x$. In the language of the RIP condition, this is the following Theorem:
+\begin{Th}\label{IHT-2}
+If $\frac{1}{\sqrt{m}}\A$ satisfies the RIP with parameters $(2s, 1/3)$, then under the assumption in Theorem \ref{IHT-1},
+\begin{align}
+||\x^{(N)}-\x_0||_2\leq \e. 
+\end{align}
+\end{Th}
+Using a more precise proof, the RIP condition in Theorem \ref{IHT-2} can be improved to $(3s, 1/2)$ with fixed step length $\eta=1/\sqrt{m}$. More details can be found in \cite{blumensath2009iterative},  \cite{jain2017non} and \cite{garg2009gradient}. Like other greedy algorithms, the IHT is easy to implement and its computational cost is relatively low. However, the theoretical result on the exact recovery of $\x_0$ is weaker and this is usually manifested in the empirical performance. 
+
+
+\subsection{$\ell_1-\ell_2$ Minimization}
+
+The $\ell_1-\ell_2$ objective function was first considered in \cite{esser2013method} by Esser, Lou and Xin in the context of nonnegative least squares problems and group sparsity with applications to spectroscopic imaging. It was shortly fully introduced to the compressed sensing setting by He, Lou, Xin and Yin in \cite{yin2015minimization}. The underlying idea is similar to the case of $\ell_q$ minimization. By plotting the level sets of $\ell_1-\ell_2$ in $\R^2$ it is easy to see that the curves approach the $x$ and $y$ axes as the values get small, hence promoting sparsity. 
+
+The $\ell_1-\ell_2$ relaxation of (\ref{cs}) can be stated as follows:
+\begin{align}
+\min ||\x||_1-||\x||_2 \ \ \ \text{subject to}\ \A\x=\A\x_0.\label{l1-l2}
+\end{align} 
+Since $||\x||_1\geq ||\x||_2$, (\ref{l1-l2}) has at least one minimizer. It was also shown in \cite{yin2015minimization} that (\ref{l1-l2}) only has finitely many minimizers. The exact recovery condition for (\ref{l1-l2}) based on the RIP condition is the following:
+\begin{Th}\label{l1-l2 Th}
+Suppose that $s$ satisfies 
+\begin{align*}
+a(s)=\left(\frac{\sqrt{3s}-1}{\sqrt{s}+1}\right)^2>1
+\end{align*}
+and $\A$ satisfies the RIP with parameters $(4s, \delta_{4s})$ such that 
+\begin{align*}
+\delta_{4s}\leq\frac{a(s)-1}{a(s)+1}.
+\end{align*}
+Then the solution to (\ref{l1-l2}) recovers $\x_0$. 
+\end{Th}
+The exact recovery condition for $\ell_1-\ell_2$ in Theorem \ref{l1-l2 Th} is less optimal than the one for the $\ell_1$ minimization. But this does not mean that $\ell_1-\ell_2$ is inferior to the $\ell_1$ in terms of promoting sparsity, as RIP conditions are only sufficient. In fact, Tran and Webster recently showed in \cite{tran2017unified} that NSP with parameter $(s, 1)$ would suffice to guarantee a class of nonconvex relaxation schemes including the $\ell_1-\ell_2$, and this will be detailed in the next section. 
+
+An efficient algorithm for solving (\ref{l1-l2}) was also proposed in \cite{yin2015minimization} along with some convergence analysis. Note that (\ref{l1-l2}) is equivalent to the following unconstrained problem:
+\begin{align}
+\min_{\x\in\R^n}\frac{1}{2}||\A\x-\b||_2^2+\lambda(||\x||_1-||\x||_2)\label{l1-l2-con}
+\end{align}
+for some $\lambda$ small. Let $F(\x)$ be the objective function in (\ref{l1-l2-con}). Then $F(\x)$ can be decomposed as the difference between two continuous proper convex functions: $F(\x)=G(\x)-H(\x)$ with $G
+(\x)=\frac{1}{2}||\A\x-\b||_2^2+\lambda ||\x||_1$ and $H(\x)=\lambda ||\x||_2$. A general descent method called DCA introduced by Tao and An in \cite{tao1998dc} can be used to solve (\ref{l1-l2-con}). It requires to compute two sequences $\{\x^{(k)}\}$ and $\{\y^{(k)}\}$ alternatingly:
+\begin{align*}
+\y^{(k+1)}&\in\partial H(\x^{(k)})\\
+\x^{(k+1)}&\in\arg\min_{\x\in\R^n}G(\x)-(H(\x^{(k)}-\langle \y^{(k+1)}, \x-\x^{(k)}\rangle).
+\end{align*}
+The $\y$ subproblem can be solved by taking derivative directly. For the $\x$ subproblem, one may decouple the $\x$ in different functions by introducing extra constraints and solve it under the framework of ADMM, with guaranteed convergence, see \cite{boyd2011distributed}. 
+
+Using the convexity of $G$ and $H$, it can be checked easily that $F(\x^{(k)})$ is decreasing. However, due to the non-convex nature of the problem, there is no guarantee for $\{\x^{(k)}\}$ to converge to a global minimizer. 
+
+It was experimentally verified in \cite{yin2015minimization} that $\ell_1-\ell_2$ method outperforms the $\ell_1$ minimization in terms of reconstructing the sparsest signal for incoherent measurements. At the same time, it was demonstrated that $\ell_1-\ell_2$ remains to have a surprising better performance over other methods when the incoherence assumption is violated. This phenomenon, which is somewhat against our intuition, cannot be explained by the analysis in the paper but does become a valuable feature of the method.   
+
+\subsection{Other Related Works}
+
+The non-convex approaches introduced in the previous sections are only a few among those well known in the signal processing community; there are many others we do not have time to go into details. It is worth mentioning that the problem (\ref{cs}) can also be interpreted as a variable selection process in high-dimensional statistics: When the number of features is much greater than the number of observations, one needs to find a coefficient vector in which only the least number of features that are statistical significant. The difference, however, lies in that in variable selection the measurement matrix $\A$ is fixed and cannot be adjusted in a way with desired properties.   
+
+Some other well-known non-convex objective functions in both communities include Smoothly Clipped Absolute Deviation (SCAD) in \cite{fan2001variable}, capped $\ell_1$ in \cite{zhang2009multi} and \cite{shen2012likelihood}, 
+transformed $\ell_1$ in \cite{lv2009unified} and \cite{zhang2014minimization}, 
+two-sided $\ell_1$ in \cite{huang2015two}, sorted $\ell_1$ in \cite{huang2015nonconvex}.
+
+As many of these non-convex objective functions are originated from the $\ell_1$, and their non-convexity is not too bad to be analyzed. For example, a unified approach to analyzing the local minimizers of non-convex objective functions with separable structures and some other specific properties are given in \cite{lv2009unified}. The very recent paper \cite{tran2017unified} further generalizes the result to a large class of non-convex objective functions without requiring separability. This will be especially useful when various norms are involved. Their main result is stated as follows:
+\begin{Th}\label{general nonconxe Th}
+Consider the general non-convex relaxation of (\ref{cs}):
+\begin{align}
+\min R(\x) \ \ \ \text{subject to}\ \A\x=\A\x_0,\label{general nonconvex}
+\end{align}
+where $R:\R^n\rightarrow [0, \infty)$. If $R(\x)$ satisfies the following properties:
+\begin{itemize}
+\item (Summetry): $R(\x)=R(|p(\x)|)$ for all $\x\in\R^n$, where $p(\x)$ is any permutation of $\x$. 
+\item (Concavity): $R(\x)$ is concave on $[0,\infty)^n$.  
+\item (Strict monotonicity): $\R(\x)\leq R(\y)$ if $x\leq y$ for all $\x, \y\geq \mathbf{0}$. The equality holds if and only if $\x=\y$.  
+\end{itemize}
+Then the NSP condition with parameters $(s,1)$ is sufficient to guarantee the solution to \ref{general nonconvex} recovers $\x_0$. 
+\end{Th}
+Note that the concavity condition can be relaxed as long as $R$ reverses the majorization order of two vectors, see \cite{tran2017unified}. For example, $\ell_1-\ell_2$ is not concave but does reverse the majorization order. Also, Theorem \ref{general nonconxe Th} can only be true globally; it does not have a fixed-support version resembling the non-uniform recovery result.  
+
+
+
+    
+
+\section{A Scale-Invariant Objective Function}
+
+There is another type of sparsity-promoting functions which are scale-invariant and not covered by Theorem \ref{general nonconxe Th}. It considers the ratio between different (quasi)norms as a measure of sparsity, see \cite{hoyer2002non} and \cite{hurley2009comparing}. The general form of the problem can be stated as follow:
+\begin{align}
+\min \frac{||\x||_{q_1}}{||\x||_{q_2}} \ \ \ \text{subject to}\ \A\x=\A\x_0,\label{l1/l2}
+\end{align}
+with $q_2>q_1$. The intuition behind it is that $\ell_{q_1}$ and $\ell_{q_2}$ norm of a vector are less different if $\x$ is either sparse or have certain compressible structures. Indeed, in one dimensional case, $||\x||_{q_1}/||\x||_{q_2}$ is exactly the same as $||\x||_0$ under the convention $0/0=0$. Similar to the analysis in the $\ell_q$ quasinorms, the solution to (\ref{l1/l2}) converges to the solution to (\ref{cs}) as $q_1\rightarrow 0$, due to the observation
+\begin{align*}
+\lim_{q_1\rightarrow 0}\frac{||\x||^{q_1}_{q_1}}{||\x||^{q_1}_{q_2}}=||\x||_0.
+\end{align*}
+
+Even though the ratio form in (\ref{l1/l2}) appears to be sparsity-promoting, analyzing is not easy. There are a few attempts made to understanding the theoretical equivalence between (\ref{l1/l2}) and (\ref{cs}) in the case where $q_1=1$ and $q_2=2$. In \cite{yin2014ratio}, Esser, Xin and Yin studied such equivalence in the case of nonnegative signals. In a more recent work in \cite{rahimi2018scale}, Lou and her collaborators applied the ratio model to the general compressed sensing context, and obtained a strong condition for $\x_0$ to be the local minimizer which is often hard to satisfy in general. They found that the NSP condition of parameters $(s, s+1)$ is sufficient to guarantee the local optimality of $\x_0$. Moreover, they proposed an algorithm based on the idea of ADMM to approximately solve it. In another paper \cite{wang2019accelerated}, Wang, Lou and Yan noticed an equivalence between the ratio model and the difference model in \cite{yin2015minimization} and therefore improved the orginal algorithm in \cite{rahimi2018scale}. They also investigated on how the dynamic range of $\x_0$ affects the recovery result. Numerically, Petrosyan, Tran and Webster demonstrated in their recent paper \cite{petrosyan2019reconstruction} that the multi-dimensional version of (\ref{l1/l2}) possesses a distinct edge over the $\ell_1$ minimization in the study of joint sparse recovery. All of these results together motivates us to better understand the theoretical aspects of the problem (\ref{l1/l2}). 
+
+
+In the rest of the section, we shall focus on the case $q_2=2$ and $q_1<1$.  We will first give more intuition on why the ratio model might be a good substitute for $\ell_1$ in some cases, and then provide an improved local optimality which is more interpretable and useful, when $q_1=1$. We will also give the first sufficient condition on the measurement matrix $\A$ to guarantee that $\x_0$ is the unique global minimizer, and show that it is easily achievable for a large class of random matrices when $q_1=1$. We also give some elementary analysis on the stability of the ratio model, following the same approach in \cite{zhang2013theory}.   
+
+\subsection{Some Intuition}
+
+Fix $q_1=1$ and $q_2=2$ in the following the discussion. We give an intuitive explanation why $\ell_1/\ell_2$ might be a good substitute to the $\ell_1$ in some situations. Consider $\x=(3,3,0,0,0,0)^T$ and $\y=(1,1,1,1,1,0.5)^T$. It is easy to calculate that $||\x||_0<||\y||_0$ but $||\x||_1>||\y||_1$. Under such circumstance, $\ell_1/\ell_2$ rises as a natural alternative. Since it is invariant under scaling, how much penalty it gives to a vector only depends on how good the position of the vector is. This, in some sense, resembles the $\ell_0$ objective. For any two vectors $\x, \y\in\R^n$ with $||\x||_0\leq ||\y||_0$ and $||\x||_1>||\y||_1$, one needs to distribute less energy into more spots in $\y$, and two situations can happen: Biased distribution and uniform distribution. In the biased case, most of the weight in $\y$ is located around a small fraction of the support and $y$ is close to a compressible signal, and this may not be allowed if the measurement satisfies some `uncertainty property'. In the uniform case, $||\y||_1/||\y||_2$ is almost of order $\sqrt{||\y||_0}$, while $||\x||_1/||\x||_2$ is at most $\sqrt{||\x||_0}$, thus it is very likely that $\ell_1/\ell_2$ of $\x$ is less than of $\y$. In other words, misdetection using $\ell_1/\ell_2$ can only find vectors with certain compressible structures. This observation is made precise by the following theorem.      
+
+%\begin{Lemma}\label{L1}
+%Let $x\in\R^n$ with $||x||_0=k\leq n$. For convenience, the components of $x$ are assumed to be nonincreasing, i.e., $x=(x_1, \cdots, x_n)^T$ satisfies that $|x_1|\geq\cdots\geq |x_k|$. Suppose for some integer $k$ that $||x_{[k]}||_1\geq\alpha ||x_{[k]^\complement}||_1$ holds true. Then,  
+%\begin{align*}
+%||x_{[k(\alpha)]}||_2\geq\sqrt{\alpha}||x_{[k]^\complement}||_2.
+%\end{align*}
+%\end{Lemma}
+%
+%\begin{proof}
+%Using the Cauchy-Schwartz inequality, we have 
+%\begin{align}
+%||x_{[k]}||_2^2&\geq k\left(\frac{||x_{[k]}||_1}{k}\right)^2.\label{e1}
+%\end{align}
+%Since the magnitude of components in $x$ is nonincreasing, 
+%\begin{align*}
+%\frac{||x_{[k]}||_1}{k}\geq|x_{k+1}|\geq\cdots\geq |x_k|. 
+%\end{align*}
+%
+%We can define another vector $x'_{[k]^\complement}$ to majorize $x_{[k]^\complement}$ as follows. $x$ is said to majorize $y$ if they have the same $\ell_1$ norm and the absolute sum of the $k$ components with the largest magnitude of $x$ is greater than that for $y$, for all $1\leq k\leq n$: 
+%
+%\begin{align*}
+%x'_{[k]^\complement}=\bigg(\underbrace{\frac{||x_{[k]}||_1}{k}, \cdots, \frac{||x_{[k]}||_1}{k}}_{\left\lfloor\frac{k||x_{[k]^\complement}||_1}{||x_{[k]}||_1}\right\rfloor}, ||x_{[k]^\complement}||_1-\left\lfloor\frac{k||x_{[k]^\complement}||_1}{||x_{[k]}||_1}\right\rfloor\cdot\frac{||x_{[k]}||_1}{k}, 0,\cdots, 0\bigg)^T. 
+%\end{align*}
+%
+%Since $|| \cdot||_2^2$ is a symmetric convex function on $\R^n$, it follows from the C.2. Proposition in \cite{marshall1979inequalities} that   
+%\begin{align}
+%||x_{[k]^\complement}||_2^2\leq ||x'_{[k]^\complement}||_2^2\leq\frac{k}{\alpha}\left(\frac{||x_{[k]}||_1}{k}\right)^2.\label{e2}
+%\end{align}   
+%(\ref{e1}) and (\ref{e2}) together imply that 
+%\begin{align*}
+%||x_{[k(\alpha)]}||_2\geq\sqrt{\alpha}||x_{[k]^\complement}||_2. 
+%\end{align*} 
+%\end{proof} 
+
+\begin{Th}\label{L2}
+Let $\x=(x_1, \cdots, x_n)^T\in\R^n$. For convenience we assume that $|x_1|\geq |x_2|\geq\cdots\geq |x_n|$. Then,
+\begin{align*}
+1=\frac{||\x_{[1]}||_1}{||\x_{[1]}||_2}\leq\cdots\leq\frac{||\x_{[n]}||_1}{||\x_{[n]}||_2}, 
+\end{align*}
+where $[k]=\{1,2,\cdots, k\}$ and $\x_{[k]}$ denotes the restriction of $\x$ to $[k]$ while setting the other components $0$. The $k$-th inequality holds if and only if $x_{k+1}=0$. Particularly, if there exists some $k\leq ||x||_0$ such that 
+\begin{align}
+\frac{|x_k|}{|x_1|}>\sqrt{\frac{s}{k}},\label{intuition-comp}
+\end{align}
+then $\x$ cannot be the minimizer to the $\ell_1/\ell_2$ minimization problem.   
+\end{Th}
+
+Before giving the proof of this theorem, we use a quick example for illustration. Let \begin{align*}
+\x=(1, 2^{-\tau}, \cdots, r^{-\tau}, 0, \cdots, 0)^T\in\R^n
+\end{align*}
+for some $0\leq\tau<1/2$ and $r>s$. If for all $k\leq ||\x||_0=r$, $|x_k|/|x_1|=k^{-\tau}\leq\sqrt{s/k}$. This is equivalent to $r\leq s^{\frac{1}{1-2\tau}}$. According to (\ref{intuition-comp}), $\x$ cannot be the $\ell_1/\ell_2$ minimizer if $r>s^{\frac{1}{1-2\tau}}$. This, to some extent, demonstrates that $\ell_1/\ell_2$ minimization can either detect some vector with a small support or a compressible structure.  
+\begin{proof}
+The proof is based on elementary calculations. For $1\leq k\leq n-1$, 
+\begin{align*}
+\frac{||\x_{[k+1]}||^2_1/||\x_{[k+1]}||^2_2}{||\x_{[k]}||^2_1/||\x_{[k]}||^2_2}\geq 1
+\end{align*}
+if and only if
+\begin{align*}
+\left(1+\frac{|x_{k+1}|}{||\x_{[k]}||_1}\right)^2\geq 1+\frac{|x_{k+1}|^2}{||\x_{[k]}||_2^2},
+\end{align*}
+or equivalently, 
+\begin{align*}
+\frac{2|x_{k+1}|}{||\x_{[k]}||_1}+\frac{|x_{k+1}|^2}{||\x_{[k]}||^2_1}\geq\frac{|x_{k+1}|^2}{||\x_{[k]}||_2^2}.
+\end{align*}
+But this must be true since
+\begin{align*}
+\frac{|x_{k+1}|^2}{||\x_{[k]}||_2^2}\leq\frac{k|x_{k+1}|}{||\x_{[k]}||_1^2}\leq\frac{1}{||\x_{[k]}||_1}, 
+\end{align*}
+where the first inequality follows from $||\x_{[k]}||_1\leq\sqrt{k}||\x_{[k]}||_2$. It is easy to see that equality holds if and only if $x_{k+1}=0$. The second part of the lemma follows from the first part and the inequality
+\begin{align*}
+\frac{||\x_{[k]}||_1}{||\x_{[k]}||_2}\geq\frac{|x_k|}{|x_1|}\sqrt{k}.
+\end{align*}
+As an immediate consequence, $\ell_1/\ell_2$ of the best $k$-term approximation of $x$ is nondecreasing over $k$. Taking a closer look at the proof above, we have 
+\begin{align*}
+\frac{||x||_1}{||x||_2}&\leq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{||\x_{[k]}||_1}\right)\leq e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{||\x_{[k]}||_1}},\\
+\frac{||x||_1}{||x||_2}&\geq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{3||\x_{[k]}||_1}\right)\approx e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{3||\x_{[k]}||_1}}.
+\end{align*}
+\end{proof}
+
+\subsection{Local Optimality Condition}
+
+We begin our analysis by giving a sufficient condition for $\x_0$ to be the local minimizer of $\ell_1/\ell_2$ under the constraint $\A\x=\A\x_0$. Compared to the global optimality condition to be obtained later, local optimality is important in the sense that it gives a more reasonable explanation for the practical implementation, as most non-convex algorithms only have local convergence guarantee. It also helps to understand when $\ell_1/\ell_2$ performs well and when not. We shall mention that the local optimality criteria proposed in this section is non-uniform, yet it offers more interpretable conditions than the one in \cite{rahimi2018scale}.
+
+\begin{Th}[Local optimality]\label{T:local}
+Consider the non-convex optimization problem (\ref{l1/l2}) with $q_1=1$ and $q_2=2$. Define
+\begin{align}
+\kappa:=\frac{||\x_0||_1||\x_0||_\infty}{||\x_0||^2_2}.\label{kappa}
+\end{align}
+Suppose that $\x_0$ satisfies  
+\begin{align}
+\rho:=\frac{\min_{i\in\text{supp}(\x_0)}|x_i|}{\max_{i\in\text{supp}(\x_0)}|x_i|}\leq\frac{2}{c(\kappa+1)},\label{ratio}
+\end{align}
+where $c$ is a parameter decoupled from $\x_0$ and depending only on $\A$, defined by 
+\begin{align*}
+c:=\sup_{\mathbf{0}\neq \h\in\ker(\A)}\frac{||\h||^2_2}{||\h||_1^2}.
+\end{align*}
+Suppose that $\A$ satisfies the following NSP condition with parameters $(s, \frac{1}{2\kappa+1})$, 
+\begin{align}
+||\h_T||_1<\frac{1}{2\kappa+1}||\h_{T^\complement}||_1\ \ \ \forall\h\in \ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s,\label{k-NSP}
+\end{align}
+Then, $\x_0$ is the local minimizer of $\ell_1/\ell_2$.   
+\end{Th}
+
+The intuition of the proof is that under the contion (\ref{k-NSP}), a big proportion of the perturbation of $\x_0$ by $\h\in\ker(\A)$ will be well-spread outside the support of $\x_0$, which necessarily increases the value of the objective function $\ell_1/\ell_2$. A more detailed analysis can be found in the recent work by the author. 
+
+
+\begin{Rem}
+It is easy to check by taking derivative that
+\begin{align*}
+1\leq\kappa\leq\frac{1}{2}(\sqrt{s}+1)
+\end{align*}
+This implies that assumption (\ref{ratio}) will be trivially met for all $s$-sparse vectors if 
+\begin{align*}
+c\leq\frac{4}{\sqrt{s}+3}\lesssim\frac{1}{\sqrt{s}}. 
+\end{align*}
+This can be compared to the global optimality condition (\ref{exact-rc}),  which requires $c\lesssim 1/s$. From this perspective, the local optimality condition is weaker than the global optimality condition, though condtion (\ref{k-NSP}) can be hard to satisfy in general. 
+\end{Rem}
+
+\begin{Rem}
+The worst case of condition (\ref{k-NSP}) is $\sqrt{s}$-NSP. This can be viewed as an improvement for the local optimality result in \cite{rahimi2018scale}, which requires $s$-NSP. In fact, in many situations in simulation (randomly generated coefficients), $\kappa$ is of order $\mathcal{O}(1)$. This means that (\ref{k-NSP}) is not as restrictive as it seems.  
+\end{Rem}
+
+\begin{Rem}
+In some literature, $\rho^{-1}$ is referred to as the dynamic range of $x_0$. Smaller the $\rho$, larger the magnitude of $x_0$ varies. It was observed in \cite{rahimi2018scale} that the performance of $\ell_1/\ell_2$ improves when the dynamic range increases. From Theorem \ref{T:local}, we notice that  (\ref{ratio}) is automatically satisfied if $\rho<4/(\sqrt{s}+3)$. This suggests that the local optimality criteria is more likely to hold for vectors with a wider range of magnitude, which is some evidence for their discovery. 
+\end{Rem} 
+
+
+\subsection{Global Optimality Condition}
+
+The uniform recoverability condition to be obtained in this section follows from elementary calculations. As we will see, the condition to be obtained will hold with overwhelming probability for a large class of subgaussian random matrices. We will consider $q_1=q<1$ and $q_2=2$. Clearly, (\ref{l1/l2}) recovers $\x_0$ if and only if for any nonzero $\h\in \ker(\A)$,
+\begin{align}
+\frac{||\x_0||^q_q}{||\x_0||^q_2}<\frac{||\x_0+\h||^q_q}{||\x_0+\h||^q_2}.\label{9}
+\end{align}
+The idea to get a sufficient condition for (\ref{9}) is to find some quantity which is less than the right-hand side of (\ref{9}) while requiring the left-hand side of (\ref{9}) be less than that quantity.     
+
+\begin{Th}[Uniform recoverability]\label{T5}
+A sufficient condition for (\ref{9}) is
+\begin{align}
+\inf_{\h\in\ker(\A)-\{\mathbf{0}\}}\frac{||\h||_q}{||\h||_2}>3^{1/q}s^{1/q-1/2}.\label{exact-rc}
+\end{align}
+\end{Th} 
+
+In the case of $q=1$, (\ref{exact-rc}) is similar to the condition (\ref{zhang-l1-l2}) for the $\ell_1$ minimization obtained by Zhang, but with a slightly worse constant. The next Theorem, which generalizes the result in (\ref{KGG}), shows that (\ref{9}) holds with high probability for a large class of subgaussian random matrices. This demonstrates the practicality of the global optimality condition as well as its asymptotic equivalence with the $\ell_1$ minimization sampling rate. 
+
+
+\begin{Th}[Practicality]\label{T4}
+Let $\A\in\R^{m\times n}$ be a subgaussian random matrix whose rows are independent, isotropic and subgaussian random vectors in $\R^n$. Let $s<m/2$ be a fixed integer. Suppose that $m, n, s$ satisfy that 
+\begin{align*}
+%m>\frac{3^{\frac{2}{2-q}}}{c_q}s\sqrt{1+\log\left(\frac{n}{s}\right)}.
+m>9c^2(1+\sqrt{2\pi}u)^2s\log n,
+\end{align*}
+where $c$ is a constant only depending on the maximum subgaussian norm of rows of $\A$. Then in the case $q=1$, (\ref{exact-rc}) holds with probability at least $1-2e^{-u^2}$. 
+\end{Th}
+
+We shall mention that based on our proof, Theorem \ref{T4} will be true for the general $\ell_q/\ell_2$ minimization problem provided a similar high-dimensional statement like Theorem \ref{T4} holds. Unfortunately, the only results we are aware of are either deterministic (regarding the Gelfand width of $\ell_q$ spaces), see \cite{foucart2010gelfand}, or with stronger assumptions, see \cite{donoho2006compressed}. The proof given here does not seem adaptable for $q<1$.   
+
+
+
+
+\subsection{Stability Analysis}
+
+Taking a similar approach in \cite{zhang2013theory}, it is possible to obtain a similar result to Theorem \ref{zhang-stability} for the $\ell_1/\ell_2$ minimization when noises are present. Consider the noisy version of (\ref{l1/l2}) with $q_1=1$ and $q_2=2$: 
+\begin{align}
+\min\frac{||\x||_1}{||\x||_2} \ \ \ \text{subject to}\ ||\A\x-\b||_2\leq\e.\label{777}
+\end{align}
+
+Let $\x$ be a minimizer of (\ref{777}). It is obvious from our assumption that $||\A\x-\A\x_0||_2\leq 2\e$, and necessarily, 
+\begin{align}
+\frac{||\x||_1}{||\x||_2}\leq\frac{||\x_0||_1}{||\x_0||_2}\leq\sqrt{s}. \label{key}
+\end{align}
+Since $\ell_1/\ell_2$ is scale-invariant, it would be difficult to distinguish $\x$ from $\x_0$ when $\x$ is almost parallel with $\x_0$. This phenomenon is manifested in the main stability result we are able to prove.    
+\begin{Th}[Stability]\label{T6}
+Let $\x$ be a minimizer of (\ref{777}). Let $0<\alpha<1$ be a fixed small number. Let $\x-\x_0=\u+\w$ with $\langle \u, \w\rangle=0$ and $\frac{||\u||_1}{||\u||_2}>\frac{4\sqrt{s}}{\alpha}$. Then the following dichotomy holds:
+\begin{itemize}
+\item \begin{align*}
+\langle \x_0, \x\rangle &\geq \left(1-\frac{\alpha^2}{2}\right)||\x_0||_2||\x||_2\\
+||\x_0||_2&\leq||\x||_2\leq (1+ \alpha)||\x_0||_2
+\end{align*} 
+hold simultaneously. This implies that
+\begin{align*}
+||\x-\x_0||_2\leq 2\sqrt{\alpha}||\x_0||_2\leq 2\sqrt{\alpha}||\x||_2. 
+\end{align*}  
+
+\item \begin{align}
+||\x-\x_0||_p\leq \left(1+\left(h^{-1}\left(\frac{4\sqrt{s}}{\alpha}\frac{||\u||_2}{||\u||_1}\right)\right)^{-1}\right)||\w||_p,\label{stab-2-est}
+\end{align}
+for either $p=1$ or $p=2$,  where $h(v)=\frac{1-v}{\sqrt{1+v^2}}$.  
+\end{itemize}
+\end{Th}
+We would like to mention how (\ref{stab-2-est}) can be useful. Take $\A$ to be an isotropic subgaussian random matrix and $\x-\x_0=\u+\w\in\ker(\A)\oplus\ker^\perp(\A)$. In this case, it follows from Theorem \ref{T4} that  
+\begin{align}
+\frac{||\u||_1}{||\u||_2}\geq\frac{8\sqrt{s}}{\alpha}>\frac{4\sqrt{s}}{\alpha}\label{ne}
+\end{align}   
+holds with high probability, if 
+\begin{align*}
+m\gtrsim \frac{64}{\alpha^2}s\log n.
+\end{align*} 
+Note that $h$ is a decreasing function on the interval $(0,1)$. Conditional on (\ref{ne}), 
+\begin{align*}
+||\x-\x_0||_p\leq (1+(h^{-1}(1/2))^{-1})||\w||_p\approx 3.23||\w||_p.  
+\end{align*}
+When $p=2$, one can go one step further to obtain a precise bound for $||w||_2$. For this we will resort to a well-known result on the lower bound of the singular value of subgaussian random matrices in \cite{rudelson2009smallest}. It was given by the Theorem 1.1 in \cite{rudelson2009smallest} that the least nonzero singular value $\s_m(\A)$ of $\A$ is lower bounded by some positive constant with high probability. More precisely, 
+\begin{align}
+\P\left(s_n(\A)\geq 0.5C\left(1-\sqrt{\frac{m-1}{n}}\right)\right)\geq 1-e^{-cn}-2^{-n-m+1},\label{stab-subg}
+\end{align}
+where $c, C>0$ are absolute constants only depending on the subgaussian distribution of $\A$. Let $\A^\dagger$ be the psudoinverse inverse of $\A$. Then, with high probability,  
+\begin{align*}
+||w||_2&=||\A^\dagger(\A(\x-\x_0))||_2\\
+&\leq ||\A^\dagger||_2||\A(\x-\x_0)||_2\\
+& = 2s^{-1}_n(\A)\e\\
+&\leq 4C^{-1}\left(1-\sqrt{\frac{m-1}{n}}\right)^{-1}\e.   
+\end{align*}
+Substituting this back into (\ref{stab-subg}) yields that
+\begin{align*}
+||\x-\x_0||_2\leq 12.92C^{-1}\left(1-\sqrt{\frac{m-1}{n}}\right)^{-1}\e
+\end{align*}
+holds with overwhelming probability.
+
+When $p=1$, we note that $||\x-\x_0||_2\leq ||\x-\x_0||_1$. Therefore, in order to obtain a similar bound as above, we can bound $||\w||_1$ by $\sqrt{n}||\w||_2$. Such bound is sharp when $\A$ is a gaussian random matrix, see Theorem \ref{T1}. This means that the unfriendly $\sqrt{n}$ is inevitable in our analysis. Therefore, it holds with overwhelming probability that  
+\begin{align*}
+||\x-\x_0||_1\leq 12.92C^{-1}\sqrt{n}\left(1-\sqrt{\frac{m-1}{n}}\right)^{-1}\e.
+\end{align*}
+
+
+     
+
+%\bibliographystyle{plain}
+%
+%\bibliography{oral-exam}
+
+\newpage
+\printbibliography
+  
+\end{document}
