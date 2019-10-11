@@ -628,7 +628,7 @@ where $R:\R^n\rightarrow [0, \infty)$. If $R(\x)$ satisfies the following proper
 \end{itemize}
 Then the NSP condition with parameters $(s,1)$ is sufficient to guarantee the solution to \ref{general nonconvex} recovers $\x_0$. 
 \end{Th}
-Note that the concavity condition can be relaxed as long as $R$ reverses the majorization order of two vectors, see \cite{tran2017unified}. For example, $\ell_1-\ell_2$ is not concave but does reverse the majorization order. Also, Theorem \ref{general nonconxe Th} can only be true globally; it does not have a fixed-support version resembling the non-uniform recovery result.  
+Note that the concavity condition can be relaxed as long as $R$ reverses the majorization order of two vectors, see \cite{tran2017unified}. Also, Theorem \ref{general nonconxe Th} can only be true globally; it does not have a fixed-support version resembling the non-uniform recovery result.  
 
 
 
@@ -726,8 +726,8 @@ where the first inequality follows from $||\x_{[k]}||_1\leq\sqrt{k}||\x_{[k]}||_
 \end{align*}
 As an immediate consequence, $\ell_1/\ell_2$ of the best $k$-term approximation of $x$ is nondecreasing over $k$. Taking a closer look at the proof above, we have 
 \begin{align*}
-\frac{||x||_1}{||x||_2}&\leq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{||\x_{[k]}||_1}\right)\leq e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{||\x_{[k]}||_1}},\\
-\frac{||x||_1}{||x||_2}&\geq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{3||\x_{[k]}||_1}\right)\approx e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{3||\x_{[k]}||_1}}.
+\frac{||\x||_1}{||\x||_2}&\leq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{||\x_{[k]}||_1}\right)\leq e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{||\x_{[k]}||_1}},\\
+\frac{||\x||_1}{||\x||_2}&\geq\prod_{k=1}^{n-1}\left(1+\frac{|x_{k+1}|}{3||\x_{[k]}||_1}\right)\approx e^{\sum_{k=1}^{n-1}\frac{|x_{k+1}|}{3||\x_{[k]}||_1}}.
 \end{align*}
 \end{proof}
 
@@ -736,46 +736,43 @@ As an immediate consequence, $\ell_1/\ell_2$ of the best $k$-term approximation 
 We begin our analysis by giving a sufficient condition for $\x_0$ to be the local minimizer of $\ell_1/\ell_2$ under the constraint $\A\x=\A\x_0$. Compared to the global optimality condition to be obtained later, local optimality is important in the sense that it gives a more reasonable explanation for the practical implementation, as most non-convex algorithms only have local convergence guarantee. It also helps to understand when $\ell_1/\ell_2$ performs well and when not. We shall mention that the local optimality criteria proposed in this section is non-uniform, yet it offers more interpretable conditions than the one in \cite{rahimi2018scale}.
 
 \begin{Th}[Local optimality]\label{T:local}
-Consider the non-convex optimization problem (\ref{l1/l2}) with $q_1=1$ and $q_2=2$. Define
+Let $\x_0$ be a nonzero $s$-sparse vector and define
 \begin{align}
 \kappa:=\frac{||\x_0||_1||\x_0||_\infty}{||\x_0||^2_2}.\label{kappa}
 \end{align}
 Suppose that $\x_0$ satisfies  
 \begin{align}
-\rho:=\frac{\min_{i\in\text{supp}(\x_0)}|x_i|}{\max_{i\in\text{supp}(\x_0)}|x_i|}\leq\frac{2}{c(\kappa+1)},\label{ratio}
+\rho:=\frac{\min_{i\in\text{supp}(\x_0)}|x_i|}{\max_{i\in\text{supp}(\x_0)}|x_i|}\leq\frac{1}{2c(\kappa+1)},\label{ratio}
 \end{align}
-where $c$ is a parameter decoupled from $\x_0$ and depending only on $\A$, defined by 
+where $c$ is a parameter decoupled from $x_0$ and depending only on $\A$, defined by 
 \begin{align*}
-c:=\sup_{\mathbf{0}\neq \h\in\ker(\A)}\frac{||\h||^2_2}{||\h||_1^2}.
+c:=\sup_{0\neq \h\in\ker(\A)}\frac{||\h||^2_2}{||\h||_1^2}
 \end{align*}
-Suppose that $\A$ satisfies the following NSP condition with parameters $(s, \frac{1}{2\kappa+1})$, 
+Suppose that $\A$ satisfies the following condition: 
 \begin{align}
-||\h_T||_1<\frac{1}{2\kappa+1}||\h_{T^\complement}||_1\ \ \ \forall\h\in \ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s,\label{k-NSP}
+||\h_T||_1<\frac{1}{2\kappa+1}||\h_{T^\complement}||_1\ \ \ \forall h\in\ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s,\label{k-NSP}
 \end{align}
 Then, $\x_0$ is the local minimizer of $\ell_1/\ell_2$.   
 \end{Th}
+
 
 The intuition of the proof is that under the contion (\ref{k-NSP}), a big proportion of the perturbation of $\x_0$ by $\h\in\ker(\A)$ will be well-spread outside the support of $\x_0$, which necessarily increases the value of the objective function $\ell_1/\ell_2$. A more detailed analysis can be found in the recent work by the author. 
 
 
 \begin{Rem}
-It is easy to check by taking derivative that
+Note that $\kappa$ is bounded from above by $(\sqrt{s}+1)/2$ for all $\x_0$ (which can be checked by taking derivative). This implies that assumption (\ref{ratio}) will be trivially met for all $s$-sparse vectors if 
 \begin{align*}
-1\leq\kappa\leq\frac{1}{2}(\sqrt{s}+1)
+c\leq\frac{1}{\sqrt{s}+3}\lesssim\frac{1}{\sqrt{s}}. 
 \end{align*}
-This implies that assumption (\ref{ratio}) will be trivially met for all $s$-sparse vectors if 
+As will be seen later, the global optimality condition requires $c\lesssim 1/s$. This is some evidence that the local optimality condition might be weaker than the global optimality condition. On the other hand, in the worst case scenario, condition (\ref{k-NSP})  becomes
 \begin{align*}
-c\leq\frac{4}{\sqrt{s}+3}\lesssim\frac{1}{\sqrt{s}}. 
+||\h_T||_1<\frac{1}{\sqrt{s}+2}||\h_{T^\complement}||_1\ \ \ \forall h\in\ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s. 
 \end{align*}
-This can be compared to the global optimality condition (\ref{exact-rc}),  which requires $c\lesssim 1/s$. From this perspective, the local optimality condition is weaker than the global optimality condition, though condtion (\ref{k-NSP}) can be hard to satisfy in general. 
+This is an improvement for the local optimality result in \cite{rahimi2018scale}, which requires $1/s$ on the right-hand of the inequality. In fact, in many situations of interest, $\kappa$ is of order $\mathcal{O}(1)$. This means that (\ref{k-NSP}) is not as restrictive as it seems.    
 \end{Rem}
 
 \begin{Rem}
-The worst case of condition (\ref{k-NSP}) is $\sqrt{s}$-NSP. This can be viewed as an improvement for the local optimality result in \cite{rahimi2018scale}, which requires $s$-NSP. In fact, in many situations in simulation (randomly generated coefficients), $\kappa$ is of order $\mathcal{O}(1)$. This means that (\ref{k-NSP}) is not as restrictive as it seems.  
-\end{Rem}
-
-\begin{Rem}
-In some literature, $\rho^{-1}$ is referred to as the dynamic range of $x_0$. Smaller the $\rho$, larger the magnitude of $x_0$ varies. It was observed in \cite{rahimi2018scale} that the performance of $\ell_1/\ell_2$ improves when the dynamic range increases. From Theorem \ref{T:local}, we notice that  (\ref{ratio}) is automatically satisfied if $\rho<4/(\sqrt{s}+3)$. This suggests that the local optimality criteria is more likely to hold for vectors with a wider range of magnitude, which is some evidence for their discovery. 
+In some literature, $\rho^{-1}$ is referred to as the dynamic range of $x_0$. Smaller the $\rho$, larger the magnitude of $x_0$ varies. It was observed in \cite{rahimi2018scale} that the performance of $\ell_1/\ell_2$ improves when the dynamic range increases. From Theorem \ref{T:local}, we notice that  (\ref{ratio}) is automatically satisfied if $\rho<1/(\sqrt{s}+3)$. This suggests that the local optimality criteria is more likely to hold for vectors with a wider range of magnitude, which is some evidence for their discovery. 
 \end{Rem} 
 
 
