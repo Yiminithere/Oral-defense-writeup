@@ -101,43 +101,75 @@
 
 %\chapter{Introduction}
 
-\section{Background}
-
-Compressed Sensing (CS), which is also called compressive sensing or compressive sampling, is a modern framework in signal processing. It was first introduced by Donoho, Cand\`es and Tao in their seminal papers  \cite{donoho2006compressed}, \cite{emmanuel2004robust} and \cite{candes2004near}, and has been widely studied by many researchers thereafter. In the following of this chapter, we aim to give a brief introduction to the background of CS as well as some motivations behind it. 
-
-In mathematics, an $n$-dimensional signal corresponds to a vector $\x$ in $\R^n$. It can be viewed as the discrete approximation of a continuous function at $n$ points. An important task in signal processing is to aquire the signal and transmit it. The traditional way of doing this involves first sampling the signal at Nyquist-rate, then calculating the new representation of the signal under a new basis/frame and retaining only a few important ones for transmission. The first step is equivalent to multiplying $\x$ by an $n\times n$ identity matrix to get its representation under the canonical basis, and the second step suffices to find the coefficients of $\x$ under a different basis/frames allowing for a more convenient representation. The convenience here is meant by a fast-decaying or compressible structure. For simplicity, one can think of it as there are only a few non-zero components in the representation of $\x$. Indeed, the second step of the traditional method implies that the information of $\x$ is concentrated in a much lower dimensional subspace of $\R^n$, while the first step, inevitably, requires sampling $\x$ at least $n$ times. This leads to the very natural question asked in \cite{donoho2006compressed}: why go to so much effort to aquire all the data when most of what we get will be thrown away? Can't we just directly measure the part that will not end up being thrown away? This motivates a completely new different modality in signal processing called compressed sensing.
-
-As we have mentioned above, validity of the second step of the traditional method is based on the assumption that $\x$ allows for a sparse representation under some basis (frames). This is not unusual in many practical situations. For example, image data is often well-localized, thus can be sparsely represented after the wavelet transform. Speech signal is always between certain frequency range, therefore is sparsely representable once transformed into the frequency domain. To improve the economy of the sampling procedure, one may propose to take some linear measurement of $\x$ using the basis/frames under which $\x$ is prior known to have a sparse representation. Unfortunately, one normally does not have the information in advance which part of basis is used in representing $\x$. This again implies that at least $\mathcal{O}(n)$ number of measurements need to be taken. A different philosophy of designing the measurement matrix is off the beaten track. 
-
-To gain some in-depth insight into the problem we are facing, it is necessary to set up an appropriate mathematical framework. The first step is to define the problem. Let $\x_0\in\R^n$ be the true signal we are interested to sample and transmit in signal processing. Suppose that $\x_0$ can be sparsely represented under the basis/frame $\Ph\in\R^{n\times k}$, where $k\geq n$. In other words,
-\begin{align*}
-\x_0 = \Ph\tilde{\x_0}
-\end{align*} 
-for some $\tilde{\x}\in\R^k$ which is sparse. We may assume that 
-\begin{align*}
-||\tilde{\x_0}||_0:=\left|\{i:  (\tilde{\x_0})_i\neq 0\}\right|=s\ll n.
-\end{align*}
-The problem we are interested in understanding can be stated as divising a good measurement $\A\in\R^{m\times n}$ such that by solving 
+\section{Introduction}
+The mathematical compressed sensing (CS) problem is to seek the sparsest solution of an underdetermined linear system:
 \begin{align}
-\A\Ph\x=\A\x = \A\x_0 = \A\Ph\tilde{\x_0},\label{origin}
+\min ||\x||_0 \ \ \ \text{subject to}\ \A\x=\b,\label{cs1}
+\end{align}
+where $\x\in\R^n, \b\in\R^m$ and $\A\in\R^{m\times n}$ with $m\ll n$. $|| \x||_0$ counts the number of nonzero components in $\x$. One may think $\x$ as the unknown signal which is sparsely representable under some basis/frames. In (\ref{cs1}), the basis/frames is assumed as the canonical basis. $\A$ is the measurement matrix to encode $\x$ and $\b$ is the corresponding measured values. In the language of signal processing, (\ref{cs1}) is equivalent to finding an appropriate decoder to reconstruct $\b$ from the pair ($\A$, $\b$).  
+
+It was established in \cite{donoho2003optimally} that under mild conditions, (\ref{cs1}) has a unique minimizer. In the rest of the paper we assume that $\x_0$ satisfying $\A\x_0=\b$ is the unique minimizer to (\ref{cs1}).  
+
+One of the central problems in compressed sensing is to design a nice algorithm to find $\x_0$. The direct approach of solving (\ref{cs1}) via combinatorial search is NP-hard, see \cite{natarajan1995sparse}. A more practical approach, which was proposed in the seminal work \cite{donoho2006compressed}, is to relax the sparsity mesure $|| \cdot||_0$ to the $\ell_1$ norm $|| \cdot||_1$:
+\begin{align}
+\min ||\x||_1 \ \ \ \text{subject to}\ \A\x=\b.\label{l11}
+\end{align} 
+
+Many pioneering works in compressed sensing in the 2000s are focused on understanding the equivalence between (\ref{cs1}) and (\ref{l11}), see \cite{donoho2006compressed}, \cite{candes2004near}, \cite{   emmanuel2004robust} and \cite{donoho2001uncertainty}. There are a lot of breakthroughs in the process. A major cornerstone of them, from a theoretical perspective, is the advent of the \emph{Null Space Property} (NSP). It was first introduced in \cite{cohen2009compressed} and plays a crucial role in the sufficient and necessary condition for the equivalence between (\ref{cs1}) and (\ref{l11}). (A sufficient condition for such equivalence is referred to as the exact recovery condition). A closely related but stronger concept is the \emph{Restricted Isometry Property} (RIP), see \cite{candes2004near}. It is more flexible to use in practice and has been adopted as a powerful tool in many works thereafter. Yet conditions given by both NSP and RIP are hard to verify in the deterministic set-up. An alternative approach based on analyzing the \emph{mutual coherence} of $\A$ produces more checkable but suboptimal conditions, see \cite{donoho2003optimally}. 
+
+Almost all exact recovery conditions based on RIP are high-probabilistic in nature. This means that their analysis normally ends up with a two-fold statement. The first part says that (\ref{cs1}) and (\ref{l11}) are equivalent for a class of sparse signals if $A$ satisfies some RIP condition; the second part says that the condition is achievable with high probability under appropriate randomness assumptions. The message to take away is that randomness plays an important role in the success of the RIP-based analysis. In fact, under proper randomness assumptions, a different approach avoiding RIP also yields fruitful results in the study of (\ref{l11}), see \cite{zhang2013theory} and \cite{vershynin2015estimation}. We shall mention that this approach is more reliant on the underlying geometry of the null space of the measurement, therefore could be potentially adapted to analyzing non-convex objectives with similar geometric interpretations. 
+
+Although (\ref{l11}) has attracted a lot of interest of study in the past decades, it was gradually realized that $\ell_1$ minimization is not robust enough to promote sparsity in the situations of undersampled measurements. This motivates the study of non-convex relaxation methods (use non-convex objectives to approximate $|| \cdot||_0$), which are believed to be more sparsity-aware. Many non-convex objective functions, such as $\ell_q$ ($0<q<1$) (\cite{gribonval2007highly}, \cite{chartrand2007exact}, \cite{foucart2009sparsest}), reweighted $\ell_1$ (\cite{candes2008enhancing}), CoSaMP (\cite{needell2009cosamp}), IHT (\cite{blumensath2009iterative}), $\ell_1-\ell_2$ (\cite{yin2014ratio}, \cite{yin2015minimization}), $\ell_1/\ell_2$ (\cite{hoyer2002non}, \cite{hurley2009comparing}, \cite{yin2014ratio},  \cite{rahimi2018scale}), and more, are empirically shown to outperform $\ell_1$ in the context of different types of measurement matrices. However, only a few of them have been successfully analyzed for theoretical recovery. In fact, obtaining exact recovery conditions and stability analysis for general non-convex optimization problems is difficult, unless the objective possesses certain exploitable structures, see \cite{lv2009unified} and \cite{tran2017unified}. 
+
+We aim to investigate the exact recovery conditions as well as the stability analysis for the objective $\ell_1/\ell_2$ in the project. To our knowledge, $\ell_1/\ell_2$ does not belong to any particular class of non-convex functions that has a systematic theory behind it. This is mainly because $\ell_1/\ell_2$ is neither convex nor concave, and is not even globally continuous. The motivation for our study is from  \cite{petrosyan2019reconstruction}.  In \cite{petrosyan2019reconstruction}, it was shown numerically that the $\ell_1/\ell_2$ beats $\ell_1$ by a big margin in the joint sparse recovery problems (in the sense that much fewer measurements are required to achieve the same recovery rate); particularly, $\ell_1/\ell_2$ allows for a high-dimensional generalization called \emph{orthogonal factor} and the corresponding minimization problem can be effectively solved using modern methods of manifold optimization. Understanding $\ell_1/\ell_2$ in the one-dimensional case would offer a baseline for its higher-dimensional counterpart. 
+
+We would like to mention that a few attempts have been made recently to revealing the theory behind $\ell_1/\ell_2$ in \cite{yin2014ratio} and \cite{rahimi2018scale}. However, their analysis is either applicable only for nonnegative signals or yields local optimality condition which is often too strict in general. The investigation on the effecient algorithms for solving the $\ell_1/\ell_2$ minimization is also actively going on, see \cite{rahimi2018scale} and \cite{wang2019accelerated}. 
+
+Our contributions are mainly in two aspects. On one hand, we propose a new local optimality criteria which provides evidence that a large dynamic range may lead to better performance of $\ell_1/\ell_2$, as observed in \cite{wang2019accelerated}. On the other hand, we conduct the first attempt to analyzing the exact recovery condition (global optimality) of $\ell_1/\ell_2$; a sufficient condition for uniform recoverability as well as some stability analysis are given. As a reminder, due to the presence of high non-convexity, none of our results is supposed to be tight; they only serve as the initial insight into certain aspects of the method that has been constantly felt in implementation. 
+
+The rest of the report is organized as follows. In Section \ref{222} we give some background knowledge on the development of compressed sensing as well as the derivation of its mathematical formulation. In Section \ref{333}, we introduce two classic methods to solve (\ref{cs1}). In Section \ref{444}, we explain an alternative perspective on $\ell_1$ minimization in \cite{zhang2013theory} and \cite{vershynin2015estimation}. In Section \ref{555}, we introduce several popular non-convex relaxation methods to solve (\ref{cs1}). In Section \ref{666}, we study a scale-invariant non-convex objective and its theoretical recovery condition. We will list the open problems in the area that have not been solved, as well as how our works can fill in the gap. We will also give a few future directions where we can go after. 
+
+
+
+
+
+\section{Background}\label{222}
+
+Compressed Sensing (CS), which is also known as compressive sensing or compressive sampling, is a modern framework in signal processing. It was first introduced by Donoho, Cand\`es and Tao in their seminal papers  \cite{donoho2006compressed}, \cite{emmanuel2004robust} and \cite{candes2004near}, and has been widely studied by many researchers thereafter. In this section, we aim to give a brief introduction to the background of CS as well as some motivations behind it. 
+
+In mathematics, an $n$-dimensional signal corresponds to a vector $\x$ in $\R^n$. It can be viewed as the discrete approximation of a continuous function at $n$ points. An important task in signal processing is to aquire the signal and transmit it. The traditional way of doing this involves first sampling the signal at Nyquist-rate, then calculating the representation of the signal under some basis/frame and retaining only a few important ones for transmission. The first step is equivalent to multiplying $\x$ by an $n\times n$ identity matrix, and the second step suffices to find the coefficients of $\x$ under a different basis/frames allowing for a more convenient representation. The convenience here is meant by a fast-decaying structure such as the power law. For simplicity, one can think of it as there are only a few non-zero components in the new representation of $\x$. Indeed, the second step of the traditional method implies that the information of $\x$ is concentrated in a much lower dimensional subspace of $\R^n$, while the first step, inevitably, requires sampling $\x$ at least $n$ times. This leads to the very natural question asked in \cite{donoho2006compressed}: why go to so much effort to aquire all the data when most of what we get will be thrown away? Can't we just directly measure the part that will not end up being thrown away? This motivates a completely different modality in signal processing called compressed sensing.
+
+As mentioned above, validity of the second step of the traditional method is based on the assumption that $\x$ allows for a sparse representation under some basis/frames. This is not unusual in many practical situations. For example, image data is often well-localized, thus can be sparsely represented after the wavelet transform. Speech signal is always between certain frequency range, therefore is sparsely representable in the frequency domain. To improve the economy of the sampling procedure, one may propose to take some linear measurement of $\x$ using the basis/frames under which $\x$ is prior known to have a sparse representation. Unfortunately, one normally does not have the information in advance which part of basis/frames is used in representing $\x$. This again implies that at least $\mathcal{O}(n)$ number of measurements need to be taken. A different philosophy of designing the measurement matrix is off the beaten track. 
+
+To gain some in-depth insight into the problem we are facing, it is necessary to set up an appropriate mathematical framework. The first step is to define the problem. Let $\x_0\in\R^n$ be the true signal we are interested to sample and transmit in signal processing. Suppose that $\x_0$ can be sparsely represented under the basis/frames $\Ph\in\R^{n\times k}$, where $k\geq n$. In other words,
+\begin{align*}
+\x_0 = \Ph\tilde{\x}_0
+\end{align*} 
+for some $\tilde{\x}_0\in\R^k$ which is sparse:
+\begin{align*}
+||\tilde{\x}_0||_0:=\left|\{i:  (\tilde{\x}_0)_i\neq 0\}\right|=s\ll n.
+\end{align*}
+The CS problem can be stated as divising a good measurement $\A\in\R^{m\times n}$ such that by solving 
+\begin{align}
+\A\Ph\x = \A\Ph\tilde{\x}_0,\label{origin}
 \end{align}    
-one is able to recover $\x_0$, where $\tilde{x}$ is the representation of $\x$ under $\Ph$. Since $\Ph$ is known, we can always incorporate $\Ph$ into $\A$ can define $\tilde{\A}=\A\Ph$. It is therefore enough to consider the case where $\Ph=\mathbf{I}_n$. Then (\ref{origin}) reduces to
+one is able to recover $\x_0$. Since $\Ph$ is known, one can always incorporate $\Ph$ into $\A$ and define $\tilde{\A}=\A\Ph$. Indeed, $\tilde{\A}$ is uniquely determined by the choice of $\A$. On the other hand, given desired $\tilde{\A}$, $\A$ is uniquely determined by $\tilde{\A}\Ph^{-1}(\Ph\Ph^T)^{-1}$, provided that $\Ph$ has linear independent rows. It is therefore enough to consider the case where $\Ph=\mathbf{I}_n$. Then (\ref{origin}) reduces to
 \begin{align}
 \A\x = \A\x_0,\label{origin'}
 \end{align} 
 with $||\x_0||_0=s$. 
 
-Our goal is to find an $\A$ such that $m$ has a stronger dependence on $s$ other than $n$. However, it is well known from classical linear algebra that if $\A$ has full row rank, (\ref{origin'}) allows for infinitely many solutions if and only if $m<n$. This means that working with (\ref{origin'}) directly seems impossible to find the right $m$, unless some additional constraint is added. The sparsity information, as expected, becomes extremely crucial in such situation. In fact, it is impossible to know exactly where the non-zero components are in $\x_0$; however, it is not hard to obtain an upper bound on how many non-zeros $\x_0$ has, which corresponds to the truncation level in the transmission step in the tradtional method. This gives rises to the reformulation of (\ref{origin'}) with a sparsity constraint:  
+Our goal is to find an $\A$ such that $m$ has a strong dependence on $s$ rather than $n$. However, it is well known from classical linear algebra that if $\A$ has full row rank, (\ref{origin'}) admits infinitely many solutions if and only if $m<n$. This means that working with (\ref{origin'}) directly seems impossible to find the right $m$, unless some additional constraint is added. The sparsity information, as expected, becomes extremely crucial in such situation. In fact, it is impossible to know exactly where the non-zero components are in $\x_0$; however, it is not hard to obtain an upper bound on how many non-zeros $\x_0$ has, which corresponds to the truncation level in the transmission step in the tradtional method. This gives rises to the reformulation of (\ref{origin'}) with a sparsity constraint:  
 \begin{align}
 \A\x = \A\x_0 \ \ \ \text{subject to}\ ||\x||_0\leq s.\label{cs-pre}
 \end{align} 
-It is easy to see that (\ref{cs-pre}) is equivalent to the following combinatorial optimization problem:
+When $\x_0$ is the sparsest solution in the feasible region (which will be discussed shortly), (\ref{cs-pre}) is equivalent to the following combinatorial optimization problem:
 \begin{align}
 \min ||\x||_0 \ \ \ \text{subject to}\ \A\x=\A\x_0.\label{cs}
 \end{align} 
-In most literature, (\ref{cs}) is referred to as the \emph{mathematical compressed sensing problem}. 
+In the literature, (\ref{cs}) is referred to as the \emph{mathematical compressed sensing problem}. 
 
-The first question to be addressed is the well-definedness of (\ref{cs}). In other words, given $\x_0$, for what measurement matrices $\A$ does (\ref{cs}) admit a unique solution? Donoho and Elad gave an answer to this question in \cite{donoho2003optimally} using the spark of a matrix. 
+The first question to be addressed is the well-definedness of (\ref{cs}). In other words, for what measurement matrices $\A$ is $\x_0$ guaranteed to be the unique sparsest solution? Donoho and Elad gave an answer to this question in \cite{donoho2003optimally} using the spark of a matrix. 
 
 \begin{Def}
 The \emph{spark} of a matrix $\A$ is the smallest number of columns from $\A$ that are linearly-dependent. 
@@ -167,11 +199,11 @@ For any $m\times m$ square submatrix $\tilde{\A}$ of $\A$, $\det(\tilde{\A})$ is
 Theorem \ref{spark} and \ref{random mesurement} together teach us a possible way to construct compressed sensing matrices and how small we should expect $m$ to be in theory. They are the mathematical foundation for comporessed sensing. As we will see later, the random nature of $\A$ will give it some distinct advantages that are not available for many determinstic choices. We shall mention that in a recent review paper \cite{rani2018systematic}, it has been pointed out that random measurement $\A$ is not appropriate to be transmitted  along with the signal in some situations. A quest for the construction of $\A$ with less randomness (or deterministic) is desired, see \cite{kasiviswanathan2019restricted}. But this is beyond our discussion of the mathematical aspect of (\ref{cs}) and therefore will not be pursued further. In the sequel we shall assume that $\text{spark}(\A)=m+1>2s$. 
  
  
-\section{Two Classical Approaches}
+\section{Two Classic Approaches}\label{333}
 
-Having settled the well-definedness of CS, it is natural to ask how to recover $\x_0$ on the receiver's side. Note that the economical sampling in CS could result in more workload in the process of transmission and decoding. Suppose that one can send both the measurement matrix $\A$ and the measured signal $\b=\A\x_0$ to the receiver's side. The remaining question comes down reconstructing $\x_0$ from $\A$ and $\b$. This is equivalent to seeking an effective algorithm to solve (\ref{cs}). The naive choice, which is to exhaustively search for all possible column subsets of size $s$ of $\A$, is impossible when $n$ is large. A better decoding strategy for the reconstruction of $\x_0$ within reasonable time is much desired. 
+Having settled the well-definedness of CS, it is natural to ask how to recover $\x_0$ on the receiver's side. Note that the economical sampling in CS could result in more workload in the process of transmission and decoding. Suppose that one can send both the measurement matrix $\A$ and the measured signal $\b=\A\x_0$ to the receiver's side. The remaining question comes down to reconstructing $\x_0$ from $\A$ and $\b$. This is equivalent to seeking an effective algorithm to solve (\ref{cs}). The naive choice, which is to exhaustively search for all possible column subsets of size $s$ of $\A$, is impossible when $n$ is large. A better decoding strategy for the reconstruction of $\x_0$ within reasonable time is much desired. 
 
-Many people have made substantial  contributions to solve (\ref{cs}) since $2005$, and the main ideas behind them can either be summarized as greedy algorithms or relaxation methods. These two approaches have completely different philosophies, as will be seen in the rest of this section.
+Many people have made substantial  contributions to solving (\ref{cs}) since $2005$, and the main ideas behind them can either be summarized as greedy algorithms or relaxation methods. These two approaches have completely different philosophies, as will be seen in the rest of this section.
 
 \subsection{Greedy Algorithms}
 
@@ -179,7 +211,7 @@ One of the most important greedy algorithms in CS is called the Orthogonal Match
 \begin{align*}
 \b=\sum_{i=1}^n\frac{\langle\a_i, \b\rangle}{||\a_i||_2^2}\a_i=\sum_{i\in\text{supp}(\x_0)}\frac{\langle\a_i, \b\rangle}{||\a_i||_2^2}\a_i, 
 \end{align*} 
-where $\a_i$ is the $i$-th column of $\A$. In this case, it is enough to calculate the inner product of $\b$ with $\a_i$ and pick out those nonzeros. Unfortunately, the columns of $\A$ cannot be orthogonal due to the economical sampling assumption $m<n$. However, it is known that in high-dimensional space that there exists exponentially many vectors that are almost orthogonal. Suppose that the columns of $\A$ satisfy the almost orthogonality assumption. It is still hopeful to do what we intended but pick out the ones that are far away from $0$. A concept called \emph{coherence} that quantifies the property of almost orthogonality is given below.
+where $\a_i$ is the $i$-th column of $\A$. In this case, it is enough to calculate the inner product of $\b$ with $\a_i$ and pick out those nonzeros. Unfortunately, the columns of $\A$ cannot be orthogonal due to the economical sampling assumption $m<n$. However, it is known that in high-dimensional space that there exist exponentially many vectors that are almost orthogonal. Suppose that the columns of $\A$ satisfy the almost orthogonality assumption. It is still hopeful to do what we intended but pick out the ones that are far away from $0$. A concept called \emph{coherence} that quantifies the property of almost orthogonality is given below.
 
 \begin{Def}
 The \emph{coherence} of a matrix $\A$ is defined by
@@ -190,7 +222,7 @@ The \emph{coherence} of a matrix $\A$ is defined by
 
 It is easy to see from definition that $\mu(\A)\in [0, 1]$. Small $\mu(\A)$ correspond to incoherent measurements. $\mu(\A)=0$ if and only if the columns of $\A$ are mutually orthogonal.
 
-The steps of OMP can be briefly described as follows. Let $\mathbf{r}$ denote the residual and $I$ denote the detected support. For initialization, set $\mathbf{r}=\b$ and $I=\emptyset$. $\e>0$ is a parameter marking the stop of the algorithm. We start by calculating $\A^T\mathbf{r}$ and selecting one of its entries with the largest magnitude. We record this index by $i$, then update $I$ by $I\cup\{i\}$ and $\mathbf{r}=\b-\A_I(\A_I^T \A_I)^{-1}\A_I^T \b$, where $\A_I$ is the restriction of $\A$ to the columns with index in $I$. The update on $\mathbf{r}$ can be seen as removing the effect of components in the detected support $I$ on $\b$ through orthogonal projection. If $||\mathbf{r}||_2<\e$ or $|I|=s$, then the algorithm terminates and $\x$ is computed by the least-squares projection $\x=(\A_I^T \A_I)^{-1}\A_I^T \b$. Otherwise go back to the first step. 
+The steps of OMP can be briefly described as follows. Let $\mathbf{r}$ denote the residual and $I$ denote the detected support. For initialization, set $\mathbf{r}=\b$ and $I=\emptyset$. $\e>0$ is a parameter marking the stop of the algorithm. We start by calculating $\A^T\mathbf{r}$ and selecting one of its entries with the largest magnitude. We record this index by $i$, then update $I$ by $I\cup\{i\}$ and $\mathbf{r}=\b-\A_I(\A_I^T \A_I)^{-1}\A_I^T \b$, where $\A_I$ is the restriction of $\A$ to the columns with index in $I$. The update on $\mathbf{r}$ can be seen as removing the effect of the components already in the detected support. If $||\mathbf{r}||_2<\e$ or $|I|=s$, then the algorithm terminates and $\x$ is computed by the least-squares projection $\x=(\A_I^T \A_I)^{-1}\A_I^T \b$. Otherwise go back to the first step. 
 
 Tropp gives the following exact recovery condition that guarantees the success of OMP. 
 
@@ -219,7 +251,7 @@ Generally, greedy algorithms in CS are quite fast and transparent, both theoreti
 
 \subsection{Convex Relaxation Methods}\label{l1-section}
   
-Compared to the greedy algorithms, the relaxation methods to be introduced in this section are more than just an ad hoc. The idea lies in replacing the sparsity measure $|| \cdot||_0$ with a different objective function which is both sparsity-promoting and computationally convenient. One of the very first ideas, as proposed in \cite{donoho2006compressed}, is the $\ell_1$ norm $|| \cdot||_1$. Note that $|| \cdot||_1$ is a convex function. There are many other relaxation approaches which are also sensitive to detecting sparsity; however, most of them are non-convex in nature and thus postoned to the later sections for detailed discussion. For the time being we shall focus on the $\ell_1$-relaxation only.
+Compared to the greedy algorithms, the relaxation methods are more than just an ad hoc. The idea lies in replacing the sparsity measure $|| \cdot||_0$ with a different objective function which is both sparsity-promoting and computationally convenient. One of the very first ideas, as proposed in \cite{donoho2006compressed}, is the $\ell_1$ norm $|| \cdot||_1$. Note that $|| \cdot||_1$ is a convex function. There are many other relaxation approaches which are also sensitive to detecting sparsity; however, most of them are non-convex in nature and thus postponed to the later section for detailed discussion. For the time being we shall focus on the $\ell_1$-relaxation only.
 
 To gain some intuition why $|| \cdot||_1$ promotes sparsity, one can plot the level sets of $|| \cdot||_1$ by increasing its radius to see the point it first touches a hyperplane at a general position. It can be seen that the intersection very likely occurs at some vertex of the level set of $|| \cdot||_1$. This motivates the following relaxed version of the original problem (\ref{cs}): 
 \begin{align}
@@ -240,7 +272,7 @@ where $\mathbf{1}=(1, \cdots, 1)^T\in\R^{2n}$.
 The desired result follows easily by rewriting $\x$ in the original problem into the difference of its postive and negative parts: $\x=\x^+-\x^-$, and rewrite it into the linear programming form.   
 \end{proof}
 
-Theorem \ref{Linear programming} ensures that (\ref{l1}) can be solved relatively efficiently (compared to $|| \cdot||_0$). It is therefore desired to understand when (\ref{l1}) and (\ref{cs}) are equivalent. An answer to this question first appeared in a series of work by Cand\`es and Tao, see \cite{emmanuel2004robust} and \cite{candes2004near}, and was later completely resolved in the seminal paper \cite{cohen2009compressed} by Cohen, Dahmen and DeVore in the study of best $k$-term approxiamtion. In order to introduce their results, we need a few more definitions:
+Theorem \ref{Linear programming} ensures that (\ref{l1}) can be solved relatively efficiently (compared to $|| \cdot||_0$). It is therefore desired to understand when (\ref{l1}) and (\ref{cs}) are equivalent. An answer to this question first appeared in a series of works by Cand\`es and Tao, see \cite{emmanuel2004robust} and \cite{candes2004near}, and was later completely resolved in the seminal paper \cite{cohen2009compressed} by Cohen, Dahmen and DeVore in the study of best $k$-term approxiamtion. In order to introduce their results, we need a few more definitions:
 
 \begin{Def}[Null Space Property, or NSP]
 $\A\in\R^{m\times n}$ is said to satisfy the null space property with parameter $(k, c)$ with respect to the norm $|| \cdot||_X$ if 
@@ -271,9 +303,9 @@ Theorem \ref{NSP-Th} shows the importance of NSP if one wishes to use the $\ell_
 \begin{Def}[Restricted Isometry Property, or RIP]
 $\A\in\R^{m\times n}$ is said to satisfy the restricted isometry property with parameters $(k, \delta)$ if for any $T\subset\{1, \cdots, n\}$ with $|T|= k$, the restriction of $\A$ to $T$ satisfies
 \begin{align}
-(1-\delta)||\x||^2_2\leq ||\A_S\x||^2_2\leq (1+\delta)||\x||^2_2, \ \ \ \forall\x\in\R^k. 
+(1-\delta)||\x||^2_2\leq ||\A_T\x||^2_2\leq (1+\delta)||\x||^2_2, \ \ \ \forall\x\in\R^k. 
 \end{align}
-In other words, $\A$ is almost an isometry once restricted to any subcolumns of size less than $s$.  
+In other words, $\A$ is almost an isometry once restricted to any subcolumns of size less than $k$.  
 \end{Def}
 
 Intuitively, RIP is a uniform version of coherence. This is made clear by the following lemma. 
@@ -354,12 +386,12 @@ Using the types of measurement matrices in Theorem \ref{random matrix estimate},
 The obvious drawback, however, is the inevitable increase in computational complexity of the algorithm. It is not very clear what the exact running time for $\ell_1$ minimization is, since there is no strongly polynomial time algorithm in linear programming yet.   Besides, the hidden constants in the estimates make the sampling bounds of little use in practice. For this, it was observed and studied by Donoho and Tanner in \cite{donoho2005neighborliness} that the $\ell_1$ minimization exhibits a phase transition phenomenon. When the sparsity level is below some threshold the $\ell_1$ minimization can exactly recover the sparsest solution with high probability. Yet if the sparsity level surpasses that threshold, $\ell_1$ minimization would fail to find the sparsest solution with an overwhelming chance. Understanding when the phase transition phenomenon occurs can hopefully help us understand these unknown constants better, see \cite{donoho2006high}, \cite{donoho2005neighborliness} and \cite{donoho2009counting} for more details. This also illustrates some intrinsic limitation of using $\ell_1$ norm in sparse recovery, especially when the sampling rate is lower than obtainable. In such case, a more robust method is called for.    
 
 
-\section{A Geometric Perspective on $\ell_1$ Minimization}
+\section{A Geometric Perspective on $\ell_1$ Minimization}\label{444}
 
 Through the $\ell_1$ minimization approach, the relaxed problem (\ref{l1}) itself allows for interpretations from different perspectives. In this section, we will mainly introduce several different views based on \cite{vershynin2015estimation} and  \cite{zhang2013theory}. As we will see, they provide valuable insight for our study of (\ref{cs}) in the case of non-convex relaxation.     
 
  
-To interprete (\ref{l1}) geometrically, we assume that entries of $\A$ are iid standard normal, which is denoted by $\mathcal{N}(0,1)$. This assumption will endow the constraint $\A\x=\b$ with some geometric flavor; the constraint imposes that $\x$ belongs to a translated subspace uniformly drawn from the Grassmanian $G_{n,n-m}$. The objective function, on the other hand, can be considered as a symmetric convex body, i.e., the $\ell_1$ ball in $\R^n$. Therefore, (\ref{l1}) is associated to a problem of understanding the section of a random subspace with a convex set in $\R^n$. 
+To interprete (\ref{l1}) geometrically, we assume that entries of $\A$ are iid standard normal, which is denoted by $\mathcal{N}(0,1)$. This assumption will endow the constraint $\A\x=\b$ with some geometric flavor; the constraint imposes that $\x$ belongs to a translated subspace uniformly drawn from the Grassmanian $G_{n,n-m}$. The objective function, on the other hand, can be considered as a symmetric convex body, i.e., the $\ell_1$ ball in $\R^n$. Therefore, (\ref{l1}) is associated to a problem of understanding the random section of a convex set in $\R^n$. 
 
 We began by introducing the approach in \cite{vershynin2015estimation}.    Visualization of convex sets in high dimensions often depends on two parts: the bulk and the outliers. The bulk is the biggest inscribed part of a convex set that resembles a round ball, and the outliers are those points contributing to the diameter of a convex set. Intuitively, the low-dimensional random section of a convex set tends to avoid the outliers, and the resulting shape is close to an Euclidean ball. As the dimension increases, the random section is more likely to capture the outliers, and the diameter of the intersected region will grow in a certain manner depending on the geometry of the convex set. The following two Theorems give a quantitative statement for what we described above. 
 
@@ -378,11 +410,10 @@ Let $K$ be a bounded subset of $\R^n$. Let $E$ be a random subspace drawn unifor
 \end{align}
 where $\g\sim\mathcal{N}(\mathbf{0},\mathbf{I}_n)$. 
 \end{Th}
-The proof Theorem \ref{T2} can be found in \cite{vershynin2018high}, and its corresponding high-dimensional probabilistic statement will be crucial in the proof of the practicality part of our result. The quantity $\E\sup_{\u\in K}|\langle \g,\u\rangle|$ on the right-hand side of (\ref{5}) is closely related to the concept of gaussian width or the gaussian complexity of a set $K$:
-\begin{Def}
-Let $K$ be a bounded set in $\R^n$. The gaussian complexity of $K$ is defined by $w(K)=\E\sup_{\x\in K}\langle\g, \x\rangle$, where $\g\sim\mathcal{N}(\mathbf{0},\mathbf{I}_n)$. The gaussian width of $K$ is defined as $w'(K)=w(K-K)$. 
+The proof Theorem \ref{T2} can be found in \cite{vershynin2018high}, and its corresponding high-dimensional probabilistic statement will be crucial in the proof of the practicality part of our result in Section \ref{666}. The quantity $\E\sup_{\u\in K}|\langle \g,\u\rangle|$ on the right-hand side of (\ref{5}) is closely related to the concept of gaussian width or gaussian complexity of a set $K$:
+\begin{Def}[Gaussian width]
+Let $K$ be a bounded set in $\R^n$. The gaussian width of $K$ is defined by $w(K)=\E\sup_{\x\in K}\langle\g, \x\rangle$, where $\g\sim\mathcal{N}(\mathbf{0},\mathbf{I}_n)$. The gaussian complexity of $K$ is defined as $w'(K)=w(K-K)$. 
 \end{Def}
-
 
 Indeed, in the case where $K$ is a symmetric convex body centered at the origin, (\ref{5}) implies that
 \begin{align}
@@ -435,11 +466,11 @@ for some $v\in (0, 1)$. Then, either for $p=1$ or $p=2$,
 \end{align*}
 where $\gamma_1=\sqrt{n}$ and $\gamma_2=1$. 
 \end{Th}
-It was also shown in \cite{zhang2013theory} that $||\w||_2$ can be further bounded by $||R^{-T}||_2\e$, where $R$ comes from the QR decomposition of $A^T$. It is worth noting that even though Theorem \ref{zhang-stability} may seem more complicated and less optimal, it is not contained in the RIP result such as Theorem \ref{CT-stability}. In fact, the constants involved in Theorem \ref{zhang-stability} are more revealing since they are directly related to the sparsity level $s$ rather than the RIP parameters, which are not invariant under invertible transforms. We note that Zhang also studied the universal recoverability concerning the ratio condition he proposed in exact recovery, but we will not go into details here.    
+It was also shown in \cite{zhang2013theory} that $||\w||_2$ can be further bounded by $||\mathbf{R}^{-T}||_2\e$, where $\mathbf{R}$ comes from the QR decomposition of $\A^T$. It is worth noting that even though Theorem \ref{zhang-stability} may seem more complicated and less optimal, it is not contained in the RIP result such as Theorem \ref{CT-stability}. In fact, the constants involved in Theorem \ref{zhang-stability} are more revealing since they are directly related to the sparsity level $s$ rather than the RIP parameters, which are not invariant under invertible transforms. We note that Zhang also studied the universal recoverability concerning a different ratio condition he proposed in $\ell_1$, but we will not go into details here.    
 
 
 
-\section{Non-convex Optimization: An Alternative Approach}
+\section{Non-convex Optimization: An Alternative Approach}\label{555}
 
 
 Although the $\ell_1$ minimization has a sound theory to guarantee for exact recovery, it has been gradually felt in practice that it is not robust enough to promote sparsity. This drives researchers to search for other possible sparsity-aware objective functions other than the $\ell_1$ norm. Such quest began shortly after the theory of the $\ell_1$ minimization was fully understood, and still remains an active area of research today that attracted people from both mathematics and engineering. The major challenge, however, is that many of the sparsity-promoting functions are non-convex in nature, leading to difficulties in proving the exact recovery condition as well as devising algorithms with explicitly known convergence guarantee. Yet many of them give substantially better empirical results than the $\ell_1$, which makes it worth investigating the theoretical aspect of these alternatives. In this section, we give a brief review on the major breakthroughs in the study of non-convex optimization in sparse recovery. 
@@ -450,7 +481,7 @@ Using the quasinorm $|| \cdot||_q$ ($0<q\leq 1$) in the study of sparse recovery
 \begin{align*}
 ||\x||_0 = \lim_{q\rightarrow 0}||\x||^q_q=\lim_{q\rightarrow 0}\sum_{i=1}^n|x_i|^q. 
 \end{align*}
-This implies that $|| \cdot||_q$ provides a better approximation to $|| \cdot||_0$ than $|| \cdot||_1$ when $q$ is less than $1$. Both the geometric and analytic evidence suggests that $\ell_q$ should have a better performance than the $\ell_1$. 
+This implies that $|| \cdot||_q$ provides a better approximation to $|| \cdot||_0$ than $|| \cdot||_1$ when $q$ is less than $1$. Both the geometric and analytic evidence suggests that $\ell_q$ should have a better performance than $\ell_1$. 
 
 Similar to (\ref{l1}), the $\ell_q$ relaxation of (\ref{cs}) can be formulated as as follows:
 \begin{align}
@@ -622,9 +653,9 @@ Consider the general non-convex relaxation of (\ref{cs}):
 \end{align}
 where $R:\R^n\rightarrow [0, \infty)$. If $R(\x)$ satisfies the following properties:
 \begin{itemize}
-\item (Summetry): $R(\x)=R(|p(\x)|)$ for all $\x\in\R^n$, where $p(\x)$ is any permutation of $\x$. 
+\item (Symmetric gauge invariance): $R(\x)=R(|p(\x)|)$ for all $\x\in\R^n$, where $p(\x)$ is any permutation of $\x$. 
 \item (Concavity): $R(\x)$ is concave on $[0,\infty)^n$.  
-\item (Strict monotonicity): $\R(\x)\leq R(\y)$ if $x\leq y$ for all $\x, \y\geq \mathbf{0}$. The equality holds if and only if $\x=\y$.  
+\item (Strict monotonicity): $R(\x)\leq R(\y)$ for all $\x\leq \y$ and $\x, \y\geq \mathbf{0}$. The equality holds if and only if $\x=\y$.  
 \end{itemize}
 Then the NSP condition with parameters $(s,1)$ is sufficient to guarantee the solution to \ref{general nonconvex} recovers $\x_0$. 
 \end{Th}
@@ -634,7 +665,7 @@ Note that the concavity condition can be relaxed as long as $R$ reverses the maj
 
     
 
-\section{A Scale-Invariant Objective Function}
+\section{A Scale-Invariant Objective Function}\label{666}
 
 There is another type of sparsity-promoting functions which are scale-invariant and not covered by Theorem \ref{general nonconxe Th}. It considers the ratio between different (quasi)norms as a measure of sparsity, see \cite{hoyer2002non} and \cite{hurley2009comparing}. The general form of the problem can be stated as follow:
 \begin{align}
@@ -645,10 +676,25 @@ with $q_2>q_1$. The intuition behind it is that $\ell_{q_1}$ and $\ell_{q_2}$ no
 \lim_{q_1\rightarrow 0}\frac{||\x||^{q_1}_{q_1}}{||\x||^{q_1}_{q_2}}=||\x||_0.
 \end{align*}
 
-Even though the ratio form in (\ref{l1/l2}) appears to be sparsity-promoting, analyzing is not easy. There are a few attempts made to understanding the theoretical equivalence between (\ref{l1/l2}) and (\ref{cs}) in the case where $q_1=1$ and $q_2=2$. In \cite{yin2014ratio}, Esser, Xin and Yin studied such equivalence in the case of nonnegative signals. In a more recent work in \cite{rahimi2018scale}, Lou and her collaborators applied the ratio model to the general compressed sensing context, and obtained a strong condition for $\x_0$ to be the local minimizer which is often hard to satisfy in general. They found that the NSP condition of parameters $(s, s+1)$ is sufficient to guarantee the local optimality of $\x_0$. Moreover, they proposed an algorithm based on the idea of ADMM to approximately solve it. In another paper \cite{wang2019accelerated}, Wang, Lou and Yan noticed an equivalence between the ratio model and the difference model in \cite{yin2015minimization} and therefore improved the orginal algorithm in \cite{rahimi2018scale}. They also investigated on how the dynamic range of $\x_0$ affects the recovery result. Numerically, Petrosyan, Tran and Webster demonstrated in their recent paper \cite{petrosyan2019reconstruction} that the multi-dimensional version of (\ref{l1/l2}) possesses a distinct edge over the $\ell_1$ minimization in the study of joint sparse recovery. All of these results together motivates us to better understand the theoretical aspects of the problem (\ref{l1/l2}). 
+Even though the ratio form in (\ref{l1/l2}) appears to be sparsity-promoting, analyzing is not easy. There are a few attempts made to understanding the theoretical equivalence between (\ref{l1/l2}) and (\ref{cs}) in the case where $q_1=1$ and $q_2=2$. In \cite{yin2014ratio}, Esser, Xin and Yin studied such equivalence in the case of nonnegative signals. In a more recent work in \cite{rahimi2018scale}, Lou and her collaborators applied the ratio model to the general compressed sensing context, and obtained a strong condition for $\x_0$ to be the local minimizer which is often hard to satisfy in general. They found that the NSP condition of parameters $(s, s+1)$ is sufficient to guarantee the local optimality of $\x_0$. Moreover, they proposed an algorithm based on the idea of ADMM to approximately solve it. In another paper \cite{wang2019accelerated}, Wang, Lou and Yan noticed an equivalence between the ratio model and the difference model in \cite{yin2015minimization} and therefore improved the orginal algorithm in \cite{rahimi2018scale}. They also investigated on how the dynamic range of $\x_0$ affects the recovery result. Numerically, Petrosyan, Tran and Webster demonstrated in their recent paper \cite{petrosyan2019reconstruction} that the multi-dimensional version of (\ref{l1/l2}) possesses a distinct edge over the $\ell_1$ minimization in the study of joint sparse recovery. All of these results together motivates us to better understand the theoretical aspects of the problem (\ref{l1/l2}).  
+
+Some open questions concerning the theoretical aspects of $\ell_1/\ell_2$ include:
+\begin{itemize}
+\item Give a reasonable recovery condition for (\ref{l1/l2});
+\item Is NSP condition with parameters $(s, 1)$ sufficient for (\ref{l1/l2}) to recover all $s$ sparse solutions in the case $q_1=1$ and $q_2=2$;
+\item Is (\ref{l1/l2}) sensitive to the noise effect?
+\item Can the joint-sparse recovery problem be analyzed using the same technique in the one-dimensional case?  
+\end{itemize}
 
 
-In the rest of the section, we shall focus on the case $q_2=2$ and $q_1<1$.  We will first give more intuition on why the ratio model might be a good substitute for $\ell_1$ in some cases, and then provide an improved local optimality which is more interpretable and useful, when $q_1=1$. We will also give the first sufficient condition on the measurement matrix $\A$ to guarantee that $\x_0$ is the unique global minimizer, and show that it is easily achievable for a large class of random matrices when $q_1=1$. We also give some elementary analysis on the stability of the ratio model, following the same approach in \cite{zhang2013theory}.   
+Our current result is able to address the first question by giving a reasonable ratio condition which is easily met for a large number of random ensembles. Moreover, we investigated on the local optimality of the method and provided a new condition that improves the result in \cite{rahimi2018scale}. We also partially answered the third question regarding the stability of the norm ratio objective when $q_1=1$ and $q_2=2$. Due to the non-convex nature of the problem, our analysis is unlikely adaptable to give a satisfying solution to the second problem and the fourth problem, but it is still worth investigating to see what can be done with a different approach. Our future work will be focused on the following directions:
+\begin{itemize}
+\item Investigate the theories behind the multi-dimensional version of $\ell_1/\ell_2$ minimization in joint-sparse recovery, possibly with a different approach.
+\item Study a similar scale-invariant relaxation approach in matrix completion problems, which is closely related to the problem of phase retrieval in signal processing. 
+\item Other interesting problems arising from compressed sensing, sparse approximation and statistical learning, as well as applications to image processing.
+\end{itemize}   
+
+In the rest of the section, we will assume that $q_2=2$ and $q_1<1$.  We will first give more intuition on why the ratio model might be a good substitute for $\ell_1$ in some cases, and then provide an improved local optimality which is more interpretable and useful, when $q_1=1$. We will also give the first sufficient condition on the measurement matrix $\A$ to guarantee that $\x_0$ is the unique global minimizer, and show that it is easily achievable for a large class of random matrices when $q_1=1$. We also give some elementary analysis on the stability of the ratio model, following the same approach in \cite{zhang2013theory}.   
 
 \subsection{Some Intuition}
 
@@ -744,7 +790,7 @@ Suppose that $\x_0$ satisfies
 \begin{align}
 \rho:=\frac{\min_{i\in\text{supp}(\x_0)}|x_i|}{\max_{i\in\text{supp}(\x_0)}|x_i|}\leq\frac{1}{2c(\kappa+1)},\label{ratio}
 \end{align}
-where $c$ is a parameter decoupled from $x_0$ and depending only on $\A$, defined by 
+where $c$ is a parameter decoupled from $\x_0$ and depending only on $\A$, defined by 
 \begin{align*}
 c:=\sup_{0\neq \h\in\ker(\A)}\frac{||\h||^2_2}{||\h||_1^2}
 \end{align*}
@@ -761,19 +807,30 @@ The intuition of the proof is that under the contion (\ref{k-NSP}), a big propor
 
 \begin{Rem}
 Note that $\kappa$ is bounded from above by $(\sqrt{s}+1)/2$ for all $\x_0$ (which can be checked by taking derivative). This implies that assumption (\ref{ratio}) will be trivially met for all $s$-sparse vectors if 
+\begin{align}
+c\leq\frac{1}{\sqrt{s}+3}\lesssim\frac{1}{\sqrt{s}}. \label{001}
+\end{align}
+In the worst case scenario, condition (\ref{k-NSP})  becomes
+\begin{align}
+||\h_T||_1<\frac{1}{\sqrt{s}+2}||\h_{T^\complement}||_1\ \ \ \forall h\in\ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s. \label{002}
+\end{align}
+It can be further checked that (\ref{002}) implies (\ref{001}). Indeed, assuming (\ref{002}) holds, $$||\h||^2_1\geq(\sqrt{s}+3)^2||\h_T||_1^2.$$ On the other hand, denote $T_r$ be the support of the $(r-1)s+1$-th to $rs$-th components of $\h$ arranged in decreasing magnitude. Using a block-type argument, 
 \begin{align*}
-c\leq\frac{1}{\sqrt{s}+3}\lesssim\frac{1}{\sqrt{s}}. 
+||\h||^2_2&\leq \left(||\h_{T_1}||_2+\sum_{r\geq 2}||\h_{T_r}||_2\right)^2\\
+&\leq \left(||\h_{T_1}||_2+\sum_{r\geq 1}\frac{1}{\sqrt{s}}||\h_{T_r}||_1\right)^2\\
+&= \left(||\h_{T_1}||_1+\frac{1}{\sqrt{s}}||\h||_1\right)^2\\
+&\leq\frac{4}{s}||\h||^2_1.
 \end{align*}
-As will be seen later, the global optimality condition requires $c\lesssim 1/s$. This is some evidence that the local optimality condition might be weaker than the global optimality condition. On the other hand, in the worst case scenario, condition (\ref{k-NSP})  becomes
+Therefore,
 \begin{align*}
-||\h_T||_1<\frac{1}{\sqrt{s}+2}||\h_{T^\complement}||_1\ \ \ \forall h\in\ker(\A), \ T\subset\{1, \cdots, n\}\ with\ |T|\leq s. 
-\end{align*}
-This is an improvement for the local optimality result in \cite{rahimi2018scale}, which requires $1/s$ on the right-hand of the inequality. In fact, in many situations of interest, $\kappa$ is of order $\mathcal{O}(1)$. This means that (\ref{k-NSP}) is not as restrictive as it seems.    
+\frac{||\h||^2_2}{||\h||_1^2}\leq\frac{4}{s(\sqrt{s}+3)^2}\leq \frac{1}{\sqrt{s}+3}. 
+\end{align*}   
+This is an improvement for the local optimality result in \cite{rahimi2018scale}, which requires $1/s$ on the right-hand of the inequality. In fact, in many situations of interest, $\kappa$ is of order $\mathcal{O}(1)$, suggesting that (\ref{k-NSP}) is not as restrictive as it seems.    
 \end{Rem}
 
 \begin{Rem}
-In some literature, $\rho^{-1}$ is referred to as the dynamic range of $x_0$. Smaller the $\rho$, larger the magnitude of $x_0$ varies. It was observed in \cite{rahimi2018scale} that the performance of $\ell_1/\ell_2$ improves when the dynamic range increases. From Theorem \ref{T:local}, we notice that  (\ref{ratio}) is automatically satisfied if $\rho<1/(\sqrt{s}+3)$. This suggests that the local optimality criteria is more likely to hold for vectors with a wider range of magnitude, which is some evidence for their discovery. 
-\end{Rem} 
+In some literature, $\rho^{-1}$ is referred to as the dynamic range of $\x_0$. Smaller the $\rho$, larger the magnitude of $\x_0$ varies. It was observed in \cite{rahimi2018scale} that the performance of $\ell_1/\ell_2$ improves when the dynamic range increases. From Theorem \ref{T:local}, we notice that  (\ref{ratio}) is automatically satisfied if $\rho<1/(\sqrt{s}+3)$. This suggests that the local optimality criteria is more likely to hold for vectors with a wider range of magnitude, which is some evidence for their discovery. 
+\end{Rem}
 
 
 \subsection{Global Optimality Condition}
